@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1545273F15A67EC300A83DED /* CCMessagequeue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1545273E15A67EC300A83DED /* CCMessagequeue.cpp */; };
+		1545274215A67ED700A83DED /* CCMessagequeue.h in Headers */ = {isa = PBXBuildFile; fileRef = 1545274115A67ED700A83DED /* CCMessagequeue.h */; };
 		1551A343158F2AB200E66CFE /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1551A342158F2AB200E66CFE /* Foundation.framework */; };
 		1551A628158F2ADE00E66CFE /* CCAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1551A355158F2ADE00E66CFE /* CCAction.cpp */; };
 		1551A629158F2ADE00E66CFE /* CCAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 1551A356158F2ADE00E66CFE /* CCAction.h */; };
@@ -362,6 +364,18 @@
 		1551A871158F2ADF00E66CFE /* CCTouchHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1551A626158F2ADE00E66CFE /* CCTouchHandler.cpp */; };
 		1551A872158F2ADF00E66CFE /* CCTouchHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = 1551A627158F2ADE00E66CFE /* CCTouchHandler.h */; };
 		1551A874158F2B4700E66CFE /* cocos2dx-Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = 1551A873158F2B4700E66CFE /* cocos2dx-Prefix.pch */; };
+		1593CD16159D545A00DE7F9B /* CCNetwork.h in Headers */ = {isa = PBXBuildFile; fileRef = 1593CD15159D545A00DE7F9B /* CCNetwork.h */; };
+		1593CD19159D547000DE7F9B /* CCNetwork.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1593CD18159D547000DE7F9B /* CCNetwork.cpp */; };
+		1593CD25159D79EB00DE7F9B /* curl.h in Headers */ = {isa = PBXBuildFile; fileRef = 1593CD1B159D79EB00DE7F9B /* curl.h */; };
+		1593CD26159D79EB00DE7F9B /* curlbuild.h in Headers */ = {isa = PBXBuildFile; fileRef = 1593CD1C159D79EB00DE7F9B /* curlbuild.h */; };
+		1593CD27159D79EB00DE7F9B /* curlrules.h in Headers */ = {isa = PBXBuildFile; fileRef = 1593CD1D159D79EB00DE7F9B /* curlrules.h */; };
+		1593CD28159D79EB00DE7F9B /* curlver.h in Headers */ = {isa = PBXBuildFile; fileRef = 1593CD1E159D79EB00DE7F9B /* curlver.h */; };
+		1593CD29159D79EB00DE7F9B /* easy.h in Headers */ = {isa = PBXBuildFile; fileRef = 1593CD1F159D79EB00DE7F9B /* easy.h */; };
+		1593CD2A159D79EB00DE7F9B /* mprintf.h in Headers */ = {isa = PBXBuildFile; fileRef = 1593CD20159D79EB00DE7F9B /* mprintf.h */; };
+		1593CD2B159D79EB00DE7F9B /* multi.h in Headers */ = {isa = PBXBuildFile; fileRef = 1593CD21159D79EB00DE7F9B /* multi.h */; };
+		1593CD2C159D79EB00DE7F9B /* stdcheaders.h in Headers */ = {isa = PBXBuildFile; fileRef = 1593CD22159D79EB00DE7F9B /* stdcheaders.h */; };
+		1593CD2D159D79EB00DE7F9B /* typecheck-gcc.h in Headers */ = {isa = PBXBuildFile; fileRef = 1593CD23159D79EB00DE7F9B /* typecheck-gcc.h */; };
+		1593CD2E159D79EB00DE7F9B /* types.h in Headers */ = {isa = PBXBuildFile; fileRef = 1593CD24159D79EB00DE7F9B /* types.h */; };
 		159A667D15904B4C003AEEC0 /* CCScrollViewLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 159A667B15904B4C003AEEC0 /* CCScrollViewLoader.cpp */; };
 		159A667E15904B4C003AEEC0 /* CCScrollViewLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = 159A667C15904B4C003AEEC0 /* CCScrollViewLoader.h */; };
 		159A668315904B57003AEEC0 /* CCScrollView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 159A668115904B57003AEEC0 /* CCScrollView.cpp */; };
@@ -369,6 +383,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1545273E15A67EC300A83DED /* CCMessagequeue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CCMessagequeue.cpp; sourceTree = "<group>"; };
+		1545274115A67ED700A83DED /* CCMessagequeue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCMessagequeue.h; sourceTree = "<group>"; };
 		1551A33F158F2AB200E66CFE /* libcocos2dx.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcocos2dx.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		1551A342158F2AB200E66CFE /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1551A355158F2ADE00E66CFE /* CCAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CCAction.cpp; sourceTree = "<group>"; };
@@ -727,6 +743,18 @@
 		1551A626158F2ADE00E66CFE /* CCTouchHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CCTouchHandler.cpp; sourceTree = "<group>"; };
 		1551A627158F2ADE00E66CFE /* CCTouchHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCTouchHandler.h; sourceTree = "<group>"; };
 		1551A873158F2B4700E66CFE /* cocos2dx-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "cocos2dx-Prefix.pch"; sourceTree = "<group>"; };
+		1593CD15159D545A00DE7F9B /* CCNetwork.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCNetwork.h; sourceTree = "<group>"; };
+		1593CD18159D547000DE7F9B /* CCNetwork.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CCNetwork.cpp; sourceTree = "<group>"; };
+		1593CD1B159D79EB00DE7F9B /* curl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = curl.h; sourceTree = "<group>"; };
+		1593CD1C159D79EB00DE7F9B /* curlbuild.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = curlbuild.h; sourceTree = "<group>"; };
+		1593CD1D159D79EB00DE7F9B /* curlrules.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = curlrules.h; sourceTree = "<group>"; };
+		1593CD1E159D79EB00DE7F9B /* curlver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = curlver.h; sourceTree = "<group>"; };
+		1593CD1F159D79EB00DE7F9B /* easy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = easy.h; sourceTree = "<group>"; };
+		1593CD20159D79EB00DE7F9B /* mprintf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mprintf.h; sourceTree = "<group>"; };
+		1593CD21159D79EB00DE7F9B /* multi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = multi.h; sourceTree = "<group>"; };
+		1593CD22159D79EB00DE7F9B /* stdcheaders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stdcheaders.h; sourceTree = "<group>"; };
+		1593CD23159D79EB00DE7F9B /* typecheck-gcc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "typecheck-gcc.h"; sourceTree = "<group>"; };
+		1593CD24159D79EB00DE7F9B /* types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = types.h; sourceTree = "<group>"; };
 		159A667B15904B4C003AEEC0 /* CCScrollViewLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CCScrollViewLoader.cpp; sourceTree = "<group>"; };
 		159A667C15904B4C003AEEC0 /* CCScrollViewLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCScrollViewLoader.h; sourceTree = "<group>"; };
 		159A668115904B57003AEEC0 /* CCScrollView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CCScrollView.cpp; sourceTree = "<group>"; };
@@ -745,11 +773,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		154E9ABD159C3BA6006589BD /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				1593CD15159D545A00DE7F9B /* CCNetwork.h */,
+				1593CD18159D547000DE7F9B /* CCNetwork.cpp */,
+				1545273E15A67EC300A83DED /* CCMessagequeue.cpp */,
+				1545274115A67ED700A83DED /* CCMessagequeue.h */,
+			);
+			name = Network;
+			path = ../../Network;
+			sourceTree = "<group>";
+		};
 		1551A334158F2AB200E66CFE = {
 			isa = PBXGroup;
 			children = (
 				1551A873158F2B4700E66CFE /* cocos2dx-Prefix.pch */,
 				1551A353158F2ADE00E66CFE /* cocos2dx */,
+				154E9ABD159C3BA6006589BD /* Network */,
 				1551A341158F2AB200E66CFE /* Frameworks */,
 				1551A340158F2AB200E66CFE /* Products */,
 			);
@@ -1188,6 +1229,7 @@
 		1551A43F158F2ADE00E66CFE /* platform */ = {
 			isa = PBXGroup;
 			children = (
+				1593CD1A159D79EB00DE7F9B /* curl */,
 				1551A46C158F2ADE00E66CFE /* CCAccelerometerDelegate.h */,
 				1551A46D158F2ADE00E66CFE /* CCApplicationProtocol.h */,
 				1551A46E158F2ADE00E66CFE /* CCCommon.h */,
@@ -1441,6 +1483,24 @@
 			path = touch_dispatcher;
 			sourceTree = "<group>";
 		};
+		1593CD1A159D79EB00DE7F9B /* curl */ = {
+			isa = PBXGroup;
+			children = (
+				1593CD1B159D79EB00DE7F9B /* curl.h */,
+				1593CD1C159D79EB00DE7F9B /* curlbuild.h */,
+				1593CD1D159D79EB00DE7F9B /* curlrules.h */,
+				1593CD1E159D79EB00DE7F9B /* curlver.h */,
+				1593CD1F159D79EB00DE7F9B /* easy.h */,
+				1593CD20159D79EB00DE7F9B /* mprintf.h */,
+				1593CD21159D79EB00DE7F9B /* multi.h */,
+				1593CD22159D79EB00DE7F9B /* stdcheaders.h */,
+				1593CD23159D79EB00DE7F9B /* typecheck-gcc.h */,
+				1593CD24159D79EB00DE7F9B /* types.h */,
+			);
+			name = curl;
+			path = third_party/ios/curl;
+			sourceTree = "<group>";
+		};
 		159A668015904B57003AEEC0 /* CCScrollView */ = {
 			isa = PBXGroup;
 			children = (
@@ -1658,6 +1718,18 @@
 				1551A874158F2B4700E66CFE /* cocos2dx-Prefix.pch in Headers */,
 				159A667E15904B4C003AEEC0 /* CCScrollViewLoader.h in Headers */,
 				159A668415904B57003AEEC0 /* CCScrollView.h in Headers */,
+				1593CD16159D545A00DE7F9B /* CCNetwork.h in Headers */,
+				1593CD25159D79EB00DE7F9B /* curl.h in Headers */,
+				1593CD26159D79EB00DE7F9B /* curlbuild.h in Headers */,
+				1593CD27159D79EB00DE7F9B /* curlrules.h in Headers */,
+				1593CD28159D79EB00DE7F9B /* curlver.h in Headers */,
+				1593CD29159D79EB00DE7F9B /* easy.h in Headers */,
+				1593CD2A159D79EB00DE7F9B /* mprintf.h in Headers */,
+				1593CD2B159D79EB00DE7F9B /* multi.h in Headers */,
+				1593CD2C159D79EB00DE7F9B /* stdcheaders.h in Headers */,
+				1593CD2D159D79EB00DE7F9B /* typecheck-gcc.h in Headers */,
+				1593CD2E159D79EB00DE7F9B /* types.h in Headers */,
+				1545274215A67ED700A83DED /* CCMessagequeue.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1869,6 +1941,8 @@
 				1551A871158F2ADF00E66CFE /* CCTouchHandler.cpp in Sources */,
 				159A667D15904B4C003AEEC0 /* CCScrollViewLoader.cpp in Sources */,
 				159A668315904B57003AEEC0 /* CCScrollView.cpp in Sources */,
+				1593CD19159D547000DE7F9B /* CCNetwork.cpp in Sources */,
+				1545273F15A67EC300A83DED /* CCMessagequeue.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1930,8 +2004,8 @@
 					"\"$(SRCROOT)/..\"",
 					"\"$(SRCROOT)/../kazmath/include\"",
 					"\"$(SDKROOT)/usr/include/libxml2\"",
+					"\"$(SRCROOT)/../platform/third_party/ios\"",
 				);
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1952,8 +2026,8 @@
 					"\"$(SRCROOT)/..\"",
 					"\"$(SRCROOT)/../kazmath/include\"",
 					"\"$(SDKROOT)/usr/include/libxml2\"",
+					"\"$(SRCROOT)/../platform/third_party/ios\"",
 				);
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
