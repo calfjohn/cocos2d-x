@@ -36,7 +36,7 @@
 
 NS_CC_NETWORK_BEGIN 
 
-class CCNetwork {
+class CC_DLL CCNetwork {
 public:
     /** returns a shared instance of the network */
 	static CCNetwork* sharedNetwork(void)

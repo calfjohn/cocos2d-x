@@ -24,9 +24,9 @@
 
 #include "CCMessageQueue.h"
 #include "CCHttpClient.h"
-#include "CCCallbackNode.h"
 #include <semaphore.h>
 #include <errno.h>
+#include "CCCallbackNode.h"
 
 NS_CC_NETWORK_BEGIN
 
@@ -37,7 +37,6 @@ static pthread_t s_responseThread;
 static unsigned int s_requestCount = 1;
 static sem_t* s_pSem = NULL;
 static sem_t* s_pSemResponse = NULL;
-static CCCallbackNode *pCallbackNode = CCCallbackNode::node();
 
 #if CC_TARGET_PLATFORM == CC_PLATFORM_IOS
 #define CC_ASYNC_TEXTURE_CACHE_USE_NAMED_SEMAPHORE 1
@@ -59,6 +58,8 @@ CCMessageQueue::CCSingletonRelease CCMessageQueue::Garbo;
 
 CCMessageQueue::CCMessageQueue()
 {
+    m_pCallbackNode = CCCallbackNode::node();
+    
     m_requestQueue.clear();
     m_responseQueue.clear();
 }
@@ -134,7 +135,7 @@ bool CCMessageQueue::init(void)
         CCLOG( "CCTextureCache async thread semaphore init error: %s\n", strerror( errno ) );
         return false;
     }
-    s_pSem = &s_semResponse;
+    s_pSemResponse = &s_semResponse;
 #endif    
 
     pthread_mutex_init(&s_asyncRequestMutex, NULL);
@@ -302,7 +303,7 @@ void* CCMessageQueue::responseThread(void* data)
                 break;
             }   
                         
-            pCallbackNode->callback(pRequestInfo);
+            CCMessageQueue::sharedMessagequeue()->getCallbackNode()->callback(pRequestInfo);
         }
     }
     

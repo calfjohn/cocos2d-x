@@ -46,6 +46,7 @@ typedef struct _RequestInfo
     int         requestMode;        //http mode 0:get 1 and orther numbers:post
 }RequestInfo;
 
+class CCCallbackNode;
 
 class CCMessageQueue {
     friend class CCNetwork;
@@ -60,6 +61,8 @@ public:
 		return m_pInstance; 
 	}    
        
+    CCCallbackNode *getCallbackNode(){return m_pCallbackNode;}
+    
 protected:
     /* push request on request queue, First Input First Output */
     void push(std::string strUrl, int mode, const char *requestData, SEL_CallFuncND selector, CCObject *rec);
@@ -101,6 +104,8 @@ private:
     std::vector<RequestInfo *> m_responseQueue;
     
     static bool m_bQuit;
+    
+    CCCallbackNode *m_pCallbackNode;
 };
 
 NS_CC_NETWORK_END

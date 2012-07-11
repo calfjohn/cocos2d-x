@@ -32,7 +32,7 @@ USING_NS_CC;
 
 NS_CC_NETWORK_BEGIN
 
-class CC_DLL CCCallbackNode : public CCNode
+class CCCallbackNode : public CCNode
 {
 public:
     
@@ -40,7 +40,7 @@ public:
      The node will be created as "autorelease".
 	 @deprecated: This interface will be deprecated sooner or later.
      */
-    CC_DEPRECATED_ATTRIBUTE static CCCallbackNode * node(void);
+    static CCCallbackNode * node(void);
     
 	/** allocates and initializes a node.
      The node will be created as "autorelease".
