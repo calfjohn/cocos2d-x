@@ -63,6 +63,9 @@ It's new in cocos2d-x since v0.99.5
     #define NS_CC_EXT_BEGIN                 namespace cocos2d { namespace extension { 
     #define NS_CC_EXT_END                   }} 
     #define USING_NS_CC_EXT                 using namespace cocos2d::extension
+    #define NS_CC_NETWORK_BEGIN             namespace ccnetwork{
+    #define NS_CC_NETWORK_END               }
+    #define USING_NS_CC_NETWORK             using namespace ccnetwork
 #else
     #define NS_CC_BEGIN                     
     #define NS_CC_END
@@ -70,6 +73,9 @@ It's new in cocos2d-x since v0.99.5
     #define NS_CC_EXT_BEGIN                 
     #define NS_CC_EXT_END    
     #define USING_NS_CC_EXT 
+    #define NS_CC_NETWORK_BEGIN
+    #define NS_CC_NETWORK_END
+    #define USING_NS_CC_NETWORK
 #endif 
 
 /** CC_PROPERTY_READONLY is used to declare a protected variable.

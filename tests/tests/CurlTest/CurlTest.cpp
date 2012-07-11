@@ -4,7 +4,9 @@
 #include "curl/curl.h"
 
 #include "Network/CCNetwork.h"
-#include "Network/CCMessagequeue.h"
+#include "Network/CCMessageQueue.h"
+
+USING_NS_CC_NETWORK;
 
 CurlTest::CurlTest()
 {
@@ -17,12 +19,12 @@ CurlTest::CurlTest()
 
     // create a label to display the tip string
     m_pLabel = CCLabelTTF::create("Touch the screen to connect", "Arial", 22);
-    m_pLabel->setPosition(ccp(s.width / 2, s.height / 2));
+    m_pLabel->setPosition(ccp(s.width / 2, s.height / 2 - 30));
     addChild(m_pLabel, 0);
     
     m_pLabel->retain();
     
-    CCMessagequeue::sharedMessagequeue();
+    CCMessageQueue::sharedMessagequeue();
 }
 
 // the test code is
@@ -30,15 +32,7 @@ CurlTest::CurlTest()
 void CurlTest::ccTouchesEnded(CCSet *pTouches, CCEvent *pEvent)
 {
     //=============================================
-//    network.Post("weibo.com", "i'm a request", strResponse);
-//    network.Post("192.168.0.116", "i'm a request", strResponse);
-//    network.Get("192.168.0.116", strResponse);
-//    network.Posts(192.168.0.116", "i'm a request", strResponse);
-//    CCNetwork::sharedNetwork()->Get("192.168.0.116", strResponse);
-//    CCNetwork::sharedNetwork()->Get("weibo.com", strResponse);
-    //CCLog("response1:%s", strResponse.c_str());
-    string strResponse;
-    CCMessagequeue::sharedMessagequeue()->pushRequest("weibo.com", "i'm a request", this, callfuncND_selector(CurlTest::callback3));
+    CCNetwork::sharedNetwork()->sendNetPackage("google.com", 0, "I'm a request", callfuncND_selector(CurlTest::callback), this);
     return;
     //=============================================
     
@@ -69,25 +63,33 @@ void CurlTest::ccTouchesEnded(CCSet *pTouches, CCEvent *pEvent)
     } 
 }
 
-void CurlTest::callback3(CCNode* sender, void* data)
+void CurlTest::callback(CCNode* sender, void* data)
 {
     RequestInfo *pRequestInfo = (RequestInfo *)data;
     
     char szName[100] = {0};
     sprintf(szName, "response %d success back", pRequestInfo->requestId);
+    CCLabelTTF* label = CCLabelTTF::create(szName, "Arial", 22);
+    addChild(label, 0);
+
+    CCSize winsize  = CCDirector::sharedDirector()->getWinSize();
+    CCAction *spawnAction = CCSpawn::actions(
+                                    CCMoveBy::actionWithDuration(2.0, ccp(0, 100)),
+                                    CCFadeOut::actionWithDuration(3.0),
+                                    NULL);
     
-//   m_pLabel->setString(szName);
+    CCAction *action = CCSequence::actions(CCMoveTo::actionWithDuration(0, ccp(winsize.width/2, winsize.height/2)),
+                                           CCShow::action(),
+                                           spawnAction,
+                                           CCCallFuncN::create(this, callfuncN_selector(CurlTest::removeThis)),
+                                           NULL);
     
-//    CCSize winsize  = CCDirector::sharedDirector()->getWinSize();
-//    CCAction *spawnAction = CCSpawn::actions(
-//                                    CCMoveBy::actionWithDuration(3.0, ccp(0, 30)),
-//                                    CCFadeOut::actionWithDuration(3.0),
-//                                    NULL);
-//    
-//    CCAction *action = CCSequence::actions(CCPlace::actionWithPosition(ccp(winsize.width/2, winsize.height/2)), CCShow::action(), spawnAction, NULL);
-//    
-//    m_pLabel->setString(szName);
-//    m_pLabel->runAction(action);
+    label->runAction(action);
+}
+
+void CurlTest::removeThis(CCNode* sender)
+{
+    sender->removeFromParentAndCleanup(true);
 }
 
 CurlTest::~CurlTest()

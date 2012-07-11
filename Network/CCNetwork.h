@@ -1,26 +1,40 @@
-//
-//  CCNetwork.h
-//  cocos2dx
-//
-//  Created by Calf on 12-6-29.
-//  Copyright (c) 2012年 厦门雅基软件有限公司. All rights reserved.
-//
+/****************************************************************************
+ Copyright (c) 2010-2012 cocos2d-x.org
+ 
+ http://www.cocos2d-x.org
+ 
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ 
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
+ ****************************************************************************/
 
 
 #ifndef COCOS2DX_CCNETWORK_H
 #define COCOS2DX_CCNETWORK_H
 
 #include "cocos2d.h"
-#include "curl/curl.h"
+#include "CCHttpClient.h"
 
 /**
  @brief    The cocos2d Network Module.
-           implement asyn/sync request base on curl
-           thanks to huyiyang2010
-           LINK: http://blog.csdn.net/huyiyang2010/article/details/7664201
+           implement send/dispatch/release net package
  */
 
-NS_CC_EXT_BEGIN //or NS_CC_NETWORK_BEGIN ?
+NS_CC_NETWORK_BEGIN 
 
 class CCNetwork {
 public:
@@ -34,28 +48,16 @@ public:
 		}
 		return m_pInstance; 
 	}
+    
+    /* send net data to server */
+    void sendNetPackage(std::string strUrl, int mode, const char *buf, cocos2d::SEL_CallFuncND selector, cocos2d::CCObject *rec);
+    
+    /* dispatch data responsed from server */
+    void dispatchNetPackage();
 
-	/** HTTP POST REQUEST*/
-	CURLcode Post(const std::string & strUrl, const std::string & strPost, std::string & strResponse);
-    
-	/** HTTP GET REQUEST*/
-	CURLcode Get(const std::string & strUrl, std::string & strResponse);
-    
-	/** HTTPS POSTS QEQUEST*/
-//	CURLcode Posts(const std::string & strUrl, const std::string & strPost, std::string & strResponse, const char * pCaPath = NULL);
-    
-	/** HTTPS GETS,无证书版本*/
-//	CURLcode Gets(const std::string & strUrl, std::string & strResponse, const char * pCaPath = NULL);
-    
-    CC_PROPERTY(bool, m_bDebug, Debug);
-        
 protected:    
     virtual bool init(void);
 
-    static int OnDebug(CURL *, curl_infotype itype, char * pData, size_t size, void *);
-    
-    static size_t WriteCallback( void *buff, size_t size, size_t nmemb, void *lpVoid);   
-    
 protected:
     CCNetwork(void);
     virtual ~CCNetwork(void);
@@ -70,9 +72,7 @@ protected:
 		}  
 	};  
 	static CCSingletonRelease Garbo; //destructor will be invoked before program exit  
-    
-    CURL * m_curl;
 };
 
-NS_CC_EXT_END
+NS_CC_NETWORK_END
 #endif

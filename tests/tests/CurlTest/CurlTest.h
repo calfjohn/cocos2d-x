@@ -12,7 +12,9 @@ public:
 
     virtual void ccTouchesEnded(cocos2d::CCSet *pTouches, cocos2d::CCEvent *pEvent);
 
-    void callback3(CCNode* sender, void* data);
+    void callback(CCNode* sender, void* data);
+    
+    void removeThis(CCNode* sendera);
 
 private:
     cocos2d::CCLabelTTF*         m_pLabel;

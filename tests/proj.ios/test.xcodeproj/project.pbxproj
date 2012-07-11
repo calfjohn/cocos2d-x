@@ -824,7 +824,6 @@
 				ADDD85F81484BB37005306E7 /* Box2D */,
 				BF1712661292933300B8313A /* chipmunk */,
 				BF31DEB212E9782200D4F513 /* CocosDenshion */,
-				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				080E96DDFE201D6D7F000001 /* ios */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 				78C7DDAA14EBA5050085D0C2 /* Resources */,
@@ -849,6 +848,7 @@
 				D44C620F132DFF4E0009C878 /* AudioToolbox.framework */,
 			);
 			name = Frameworks;
+			path = ../proj.ios;
 			sourceTree = "<group>";
 		};
 		4AB28AD21589152800276E8B /* CocosBuilderTest */ = {
@@ -1569,6 +1569,7 @@
 		BF31E11812E979A100D4F513 /* tests */ = {
 			isa = PBXGroup;
 			children = (
+				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				BF31E11912E979A100D4F513 /* AccelerometerTest */,
 				BF31E11C12E979A100D4F513 /* ActionManagerTest */,
 				789B5604151979E80038CD1E /* ActionsEaseTest */,
