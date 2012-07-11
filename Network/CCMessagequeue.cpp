@@ -26,6 +26,7 @@
 #include "CCHttpClient.h"
 #include <semaphore.h>
 #include <errno.h>
+#include <pthread.h>
 #include "CCCallbackNode.h"
 
 NS_CC_NETWORK_BEGIN
