@@ -147,7 +147,7 @@ bool CCMessageQueue::init(void)
     return true;
 }
 
-void CCMessageQueue::push(std::string strUrl, int mode, const char * requestData, SEL_CallFuncND selector, CCObject *rec)
+bool CCMessageQueue::push(std::string strUrl, int mode, const char * requestData, SEL_CallFuncND selector, CCObject *rec)
 {
     RequestInfo *tempInfo = new RequestInfo();
     tempInfo->requestId = s_requestCount++;
@@ -168,6 +168,8 @@ void CCMessageQueue::push(std::string strUrl, int mode, const char * requestData
     CCLOG("request %d send", tempInfo->requestId);//, tempInfo->sendTime.tv_usec*1000+tempInfo->sendTime.tv_usec/1000);
 
     sem_post(s_pSem);
+    
+    return true;
 }
 
 RequestInfo* CCMessageQueue::popUpRequest()

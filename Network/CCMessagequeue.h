@@ -65,7 +65,7 @@ public:
     
 protected:
     /* push request on request queue, First Input First Output */
-    void push(std::string strUrl, int mode, const char *requestData, SEL_CallFuncND selector, CCObject *rec);
+    bool push(std::string strUrl, int mode, const char *requestData, SEL_CallFuncND selector, CCObject *rec);
 
     /* pop up a valid response */
     RequestInfo *popUp();
