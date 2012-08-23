@@ -59,8 +59,6 @@ CCMessageQueue::CCSingletonRelease CCMessageQueue::Garbo;
 
 CCMessageQueue::CCMessageQueue()
 {
-    m_pCallbackNode = CCCallbackNode::node();
-    
     m_requestQueue.clear();
     m_responseQueue.clear();
 }
@@ -130,7 +128,7 @@ bool CCMessageQueue::init(void)
         return false;
     }
 #else
-    int semInitRet = sem_init(&s_semResponse, 0, 0);
+    semInitRet = sem_init(&s_semResponse, 0, 0);
     if( semInitRet < 0 )
     {
         CCLOG( "CCTextureCache async thread semaphore init error: %s\n", strerror( errno ) );
@@ -147,18 +145,23 @@ bool CCMessageQueue::init(void)
     return true;
 }
 
-bool CCMessageQueue::push(std::string strUrl, int mode, const char * requestData, SEL_CallFuncND selector, CCObject *rec)
+void CCMessageQueue::push(std::string strUrl, int mode, const char * requestData, SEL_CallFuncND selector, CCObject *rec)
 {
     RequestInfo *tempInfo = new RequestInfo();
     tempInfo->requestId = s_requestCount++;
-    tempInfo->strUrl = strUrl;
-    tempInfo->strRequestData = requestData;
+	tempInfo->strUrl = strUrl;
+	if(requestData){
+		tempInfo->strRequestData = requestData;
+	}else{
+		tempInfo->strRequestData.clear();
+	}
     tempInfo->strResponseData.clear();
     tempInfo->target = rec;
     tempInfo->pfnSelector = selector;
     tempInfo->stateCode = CURL_LAST;
     tempInfo->requestMode = mode;
-    tempInfo->target->retain();
+    CC_SAFE_RETAIN(tempInfo->target);
+
     CCTime::gettimeofdayCocos2d(&tempInfo->sendTime, NULL);
     
     pthread_mutex_lock(&s_asyncRequestMutex);
@@ -168,8 +171,6 @@ bool CCMessageQueue::push(std::string strUrl, int mode, const char * requestData
     CCLOG("request %d send", tempInfo->requestId);//, tempInfo->sendTime.tv_usec*1000+tempInfo->sendTime.tv_usec/1000);
 
     sem_post(s_pSem);
-    
-    return true;
 }
 
 RequestInfo* CCMessageQueue::popUpRequest()
@@ -217,7 +218,7 @@ RequestInfo* CCMessageQueue::popUp()
         }
         else
         {
-            tempInfo->target->release();
+            CC_SAFE_RELEASE(tempInfo->target);
             m_responseQueue.pop_back();
         }
     }
@@ -305,8 +306,13 @@ void* CCMessageQueue::responseThread(void* data)
             {
                 break;
             }   
-                        
-            CCMessageQueue::sharedMessagequeue()->getCallbackNode()->callback(pRequestInfo);
+                
+            CCCallbackNode* pCallbackNode = CCMessageQueue::sharedMessagequeue()->getCallbackNode();
+            if(pCallbackNode)
+            {
+                pCallbackNode->callback(pRequestInfo);
+            }
+            
         }
     }
     
@@ -322,6 +328,14 @@ void* CCMessageQueue::responseThread(void* data)
     }
     
     return 0;
+}
+
+CCCallbackNode *CCMessageQueue::getCallbackNode()
+{
+    CCCallbackNode* pCallbackNode = CCCallbackNode::node();
+    CC_SAFE_RETAIN(pCallbackNode);
+    
+    return pCallbackNode;
 }
 
 NS_CC_NETWORK_END

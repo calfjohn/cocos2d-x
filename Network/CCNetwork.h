@@ -50,7 +50,7 @@ public:
 	}
     
     /* send net data to server */
-    bool sendNetPackage(std::string strUrl, int mode, const char *buf, cocos2d::SEL_CallFuncND selector, cocos2d::CCObject *rec);
+    void sendNetPackage(std::string strUrl, int mode, const char *buf, cocos2d::SEL_CallFuncND selector, cocos2d::CCObject *rec);
     
     /* dispatch data responsed from server */
     void dispatchNetPackage();

@@ -32,7 +32,8 @@ CurlTest::CurlTest()
 void CurlTest::ccTouchesEnded(CCSet *pTouches, CCEvent *pEvent)
 {
     //=============================================
-    CCNetwork::sharedNetwork()->sendNetPackage("google.com", 0, "I'm a request", callfuncND_selector(CurlTest::callback), this);
+//    CCNetwork::sharedNetwork()->sendNetPackage("google.com", 0, "I'm a request", callfuncND_selector(CurlTest::callback), this);
+    CCNetwork::sharedNetwork()->sendNetPackage("192.168.0.128:22222/game/getbible", 1, "I'm a request", callfuncND_selector(CurlTest::callback), this);
     return;
     //=============================================
     
@@ -66,7 +67,7 @@ void CurlTest::ccTouchesEnded(CCSet *pTouches, CCEvent *pEvent)
 void CurlTest::callback(CCNode* sender, void* data)
 {
     RequestInfo *pRequestInfo = (RequestInfo *)data;
-    
+    CCLOG("%s", pRequestInfo->strResponseData.c_str());
     char szName[100] = {0};
     sprintf(szName, "response %d success back", pRequestInfo->requestId);
     CCLabelTTF* label = CCLabelTTF::create(szName, "Arial", 22);

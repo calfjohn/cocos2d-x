@@ -2,6 +2,7 @@
 #define _TRANSITIONS_TEST_H_
 
 #include "../testBasic.h"
+#include "extensions/CCTouchPageTurn/CCTouchPageTurn.h"
 
 USING_NS_CC;
 

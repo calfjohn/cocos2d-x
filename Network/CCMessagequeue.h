@@ -61,11 +61,11 @@ public:
 		return m_pInstance; 
 	}    
        
-    CCCallbackNode *getCallbackNode(){return m_pCallbackNode;}
+    CCCallbackNode *getCallbackNode();
     
 protected:
     /* push request on request queue, First Input First Output */
-    bool push(std::string strUrl, int mode, const char *requestData, SEL_CallFuncND selector, CCObject *rec);
+    void push(std::string strUrl, int mode, const char *requestData, SEL_CallFuncND selector, CCObject *rec);
 
     /* pop up a valid response */
     RequestInfo *popUp();
@@ -104,8 +104,6 @@ private:
     std::vector<RequestInfo *> m_responseQueue;
     
     static bool m_bQuit;
-    
-    CCCallbackNode *m_pCallbackNode;
 };
 
 NS_CC_NETWORK_END

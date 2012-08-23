@@ -44,9 +44,12 @@ bool CCNetwork::init()
     return true;
 }
 
-bool CCNetwork::sendNetPackage(std::string strUrl, int mode, const char *buf, cocos2d::SEL_CallFuncND selector, cocos2d::CCObject *rec)
+void CCNetwork::sendNetPackage(std::string strUrl, int mode, const char *buf, cocos2d::SEL_CallFuncND selector, cocos2d::CCObject *rec)
 {
-    return CCMessageQueue::sharedMessagequeue()->push(strUrl, mode, buf, selector, rec);
+    CCLOG("url:%s",strUrl.c_str());
+    CCLOG("post:%s", buf);
+    
+    CCMessageQueue::sharedMessagequeue()->push(strUrl, mode, buf, selector, rec);
 }
 
 void CCNetwork::dispatchNetPackage()
