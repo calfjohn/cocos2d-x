@@ -76,7 +76,7 @@ CCObject* CCAction::copyWithZone(CCZone *pZone)
     else
     {
         pRet = new CCAction();
-        pZone = pNewZone = new CCZone(pRet);
+        pNewZone = new CCZone(pRet);
     }
     //copy member data
     pRet->m_nTag = m_nTag;
@@ -244,7 +244,7 @@ bool CCFollow::initWithTarget(CCNode *pFollowedNode, const CCRect& rect/* = CCRe
  
     pFollowedNode->retain();
     m_pobFollowedNode = pFollowedNode;
-    if (CCRect::CCRectEqualToRect(rect, CCRectZero))
+    if (rect.equals(CCRectZero))
     {
         m_bBoundarySet = false;
     }

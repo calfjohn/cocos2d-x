@@ -97,7 +97,8 @@ static bool _initWithImage(CGImageRef cgImage, tImageInfo *pImageinfo)
     CGContextDrawImage(context, CGRectMake(0, 0, pImageinfo->width, pImageinfo->height), cgImage);
     
     CGContextRelease(context);
-    
+    CFRelease(colorSpace);
+  
     return true;
 }
 
@@ -227,32 +228,32 @@ static bool _initWithString(const char * pText, cocos2d::CCImage::ETextAlign eAl
         font = [UIFont fontWithName:fntName size:nSize];  
         if (font)
         {
-                dim = _calculateStringSizeWithFontOrZFont(str, font, &constrainSize, false);
+            dim = _calculateStringSizeWithFontOrZFont(str, font, &constrainSize, false);
         }      
         
         if (! font)
         {
-                font = [[FontManager sharedManager] zFontWithName:fntName pointSize:nSize];
-                if (font)
-                {
-                    dim =_calculateStringSizeWithFontOrZFont(str, font, &constrainSize, true);
-                }  
+            font = [[FontManager sharedManager] zFontWithName:fntName pointSize:nSize];
+            if (font)
+            {
+                dim =_calculateStringSizeWithFontOrZFont(str, font, &constrainSize, true);
+            }  
         }
 
         if (! font)
         {
-                fntName = _isValidFontName(pFontName) ? fntName : @"MarkerFelt-Wide";
-                font = [UIFont fontWithName:fntName size:nSize];
+            fntName = _isValidFontName(pFontName) ? fntName : @"MarkerFelt-Wide";
+            font = [UIFont fontWithName:fntName size:nSize];
                 
-                if (! font) 
-                {
-                        font = [UIFont systemFontOfSize:nSize];
-                }
+            if (! font) 
+            {
+                font = [UIFont systemFontOfSize:nSize];
+            }
                 
-                if (font)
-                {
-                    dim = _calculateStringSizeWithFontOrZFont(str, font, &constrainSize, false);
-                }  
+            if (font)
+            {
+                dim = _calculateStringSizeWithFontOrZFont(str, font, &constrainSize, false);
+            }  
         }
 
         CC_BREAK_IF(! font);
@@ -308,18 +309,18 @@ static bool _initWithString(const char * pText, cocos2d::CCImage::ETextAlign eAl
         
         // measure text size with specified font and determine the rectangle to draw text in
         unsigned uHoriFlag = eAlign & 0x0f;
-        UITextAlignment align = (2 == uHoriFlag) ? UITextAlignmentRight
+        UITextAlignment align = (UITextAlignment)((2 == uHoriFlag) ? UITextAlignmentRight
                                 : (3 == uHoriFlag) ? UITextAlignmentCenter
-                                : UITextAlignmentLeft;
+                                : UITextAlignmentLeft);
         
         // normal fonts
         if( [font isKindOfClass:[UIFont class] ] )
         {
-            [str drawInRect:CGRectMake(0, startH, dim.width, dim.height) withFont:font lineBreakMode:UILineBreakModeWordWrap alignment:align];
+            [str drawInRect:CGRectMake(0, startH, dim.width, dim.height) withFont:font lineBreakMode:(UILineBreakMode)UILineBreakModeWordWrap alignment:align];
         }
         else // ZFont class 
         {
-            [FontLabelStringDrawingHelper drawInRect:str rect:CGRectMake(0, startH, dim.width, dim.height) withZFont:font lineBreakMode:UILineBreakModeWordWrap alignment:align];
+            [FontLabelStringDrawingHelper drawInRect:str rect:CGRectMake(0, startH, dim.width, dim.height) withZFont:font lineBreakMode:(UILineBreakMode)UILineBreakModeWordWrap alignment:align];
         }
         
         UIGraphicsPopContext();

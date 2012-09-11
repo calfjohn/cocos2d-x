@@ -5,16 +5,19 @@ echo.* Check VC++ environment...
 echo.*/
 echo.
 
-if defined VS90COMNTOOLS (
-    set VSVARS="%VS90COMNTOOLS%vsvars32.bat"
-    set VC_VER=90
+if defined VS110COMNTOOLS (
+    set VSVARS="%VS110COMNTOOLS%vsvars32.bat"
+    set VC_VER=110
 ) else if defined VS100COMNTOOLS (
     set VSVARS="%VS100COMNTOOLS%vsvars32.bat"
     set VC_VER=100
-)
+) else if defined VS90COMNTOOLS (
+    set VSVARS="%VS90COMNTOOLS%vsvars32.bat"
+    set VC_VER=90
+) 
 
 if not defined VSVARS (
-    echo Can't find VC2008 or VC2010 installed!
+    echo Can't find VC2008, VC2010 or VC2012 installed!
     goto ERROR
 )
 
@@ -29,27 +32,31 @@ if %VC_VER%==90 (
 ) else if %VC_VER%==100 (
     msbuild cocos2d-win32.vc2010.sln /p:Configuration="Debug" 
     msbuild cocos2d-win32.vc2010.sln /p:Configuration="Release"
+) else if %VC_VER%==110 (
+    msbuild cocos2d-win32.vc2012.sln /t:Clean
+    msbuild cocos2d-win32.vc2012.sln /p:Configuration="Debug" /m
+    msbuild cocos2d-win32.vc2012.sln /p:Configuration="Release" /m
 ) else (
     echo Script error.
     goto ERROR
 )
 
 echo./*
-echo.* Check the cocos2d-win32 application "tests.exe" ...
+echo.* Check the cocos2d-win32 application "TestCpp.exe" ...
 echo.*/
 echo.
 
 cd ".\Release.win32\"
 
-set CC_TEST_BIN=tests.exe
+set CC_TEST_BIN=TestCpp.exe
 
-set CC_TEST_RES=..\tests\Resources\*.*
-set CC_HELLOWORLD_RES=..\HelloWorld\Resources\*.*
-set CC_HELLOLUA_RES=..\HelloLua\Resources\*.*
-set CC_TESTJS_RES=..\testjs\Resources\*.*
+set CC_TEST_RES=..\samples\TestCpp\Resources\*.*
+set CC_HELLOWORLD_RES=..\samples\HelloCpp\Resources\*.*
+set CC_HELLOLUA_RES=..\samples\HelloLua\Resources\*.*
+set CC_TESTJS_RES=..\samples\TestJavascript\Resources\*.*
 
 if not exist "%CC_TEST_BIN%" (
-    echo Can't find the binary "tests.exe", is there build error?
+    echo Can't find the binary "TestCpp.exe", is there build error?
     goto ERROR
 )
 

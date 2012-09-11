@@ -1,3 +1,108 @@
+cocos2d-2.0-x-2.0.2 @Aug.30 2012
+ [all platforms]
+    Bug       #1298: fix a logical error of CCSequence
+    Bug       #1371: fix a particle crashes if setAutoRemoveOnFinish(true)
+    Bug       #1379: fix a typo error of comment in CCNode.cpp
+    Bug       #1381: fix a bug that CCLayerColor::setContentSize() declared differently with CCNode::setContentSize()
+    Bug       #1382: fix a crash of CCBReader caused by null pointer
+    Bug       #1384: fix an error when loading CCControlButton from ccbi
+    Bug       #1385: fix a logic error in BitmapFontMultiLineAlignment
+    Bug       #1386: fix a crash of PauseResumeActionsTest
+    Bug       #1395: fix a bug that CCTextureCache::addImage ignores error in CCTexture2D::initWithImage()
+    Bug       #1400: re-assign texture rect of CCControlSlider to consider SpriteFrame orientation
+    Bug       #1403: fix a bug that do not support png8 format
+    Bug       #1408: fix a bug that CCMenuItemImage is not loaded when the target and selector are empty in CCBReader
+    Bug       #1409: fix a bug that loading CCControlButton from ccbi failed
+    Bug       #1427: fix a bug that CCArray::randomObject() may use index that out of range
+    Bug       #1430: fix a bug that can not compute correct label's width or height when its value is 0
+    Bug       #1440: fix a bug that CCSprite::displayFrame() uses wrong offset to create a sprite frame
+    Feature   #1416: add object-oriented API of CCGeometry
+    Feature   #1405: implement multi-resolution adaption solution
+    Feature   #1424: add a simple wrapper of http access
+    Feature   #1429: add CCEditBox which wraps system edit control
+    Feature   #1439: synchronize to cocos2d-iphone 2.0 stable version
+    Refactor  #1399: adjust directory structure
+    Refactor  #1402: improve static creator function names to avoid confusion
+    Refactor  #1413: improve CCTouch::getLocation(), getDelta() which returns OpenGL coordinates directly
+    Refactor  #1437: change the return type of CCApplication::sharedApplication() and CCEGLView::sharedOpenGLView() to a pointer
+    Refactor  #1441: put hd and iPad resources of TestCpp into separate directories
+    Refactor  #1442: use CREATE_FUNC to replace LAYER_CREATE_FUNC and SCENE_CREATE_FUNC
+ [iOS]
+    Bug       #1389: fix a Xcode 4.5-specific compiling errors that can not convert -1 to unsigned int
+    Bug       #1432: fix a bug that "MutiTouchTest" crashes on IOS if putting more than 5 fingers on the screen
+    Refactor  #1383: change the file path that CCUserDefault saves xml file in
+    Refactor  #1433: remove fpsxxx.png in template
+    Refactor  #1443: Fix some warnings
+ [android]
+    Bug       #1284: use OpenSL ES to play effects when the device is i9100
+    Bug       #1372: fix a typo error in platform/android/CCEGLView.h
+    Bug       #1377: fix TMX Tile cracks in the Test App
+    Refactor  #1407: cleaner build script
+    Refactor  #1438: make android template use its own source files
+ [mac os]
+    Bug       #1417: fix a compiling error when building TestCpp for mac port using command line
+    Feature   #1401: add mac port
+ [win32]
+    Bug       #1390: fix a win32 error says "The application failed to initialize properly"
+ [linux]
+    Bug       #1445: fix compiling errors on linux
+    Feature   #1419: add linux port
+ [blackberry]
+    Feature   #1420: add blackberry port
+
+cocos2d-2.0-rc2-x-2.0.1 @Jun.28 2012
+ [all platforms]
+    Bug       #1257: synchronize CCGrabber.cpp 
+    Bug       #1280: fix a bug that BitmapFontMultiLineAlignment test doesn't work correctly
+    Bug       #1286: fix the declaration of tgaLoadRLEImageData()
+    Bug       #1293: fix a bug that CCDirector::getFrames() returns wrong value
+    Bug       #1296: fix a logical error in CCTMXTiledMap::tilesetForLayer()
+    Bug       #1300: fix a typo of CC_ENABLE_CACHE_TEXTTURE_DATA
+    Bug       #1301: apply scissor with points in CCEGLView::sharedOpenGLView().setScissorInPoints()
+    Bug       #1302: change the parameter type of CCMenu::setHandlerPriority to signed int
+    Bug       #1308: fix a logical bug in CCTouchDispatcher
+    Bug       #1326: fix a bug that the compilation of Hellolua and testjs project was broken after synchronizing to rc2
+    Bug       #1330: fix bugs of CCBIReader
+    Bug       #1335: fix memory leaks in cocos2dx and CCBReader
+    Bug       #1368: implement a test case(Effect4) in EffectsAdvancedTest
+    Feature   #1202: remove CCFileData
+    Feature   #1310: synchronize to rc2
+    Feature   #1323: support  CCBIReader
+    Feature   #1324: add create() for static member functions that new an autorelease object
+    Feature   #1332: add macro COCOS2D_VERSION in cocos2d.h
+    Feature   #1333: support CCScrollView
+    Feature   #1334: add ScrollViewTest to CocosBuilderTest
+    Refactor  #1181: refactor CCRenderTexture
+    Refactor  #1283: use relative path in cocos2d.h
+    Refactor  #1288: enhances CCTransitionScene to work even if there is no running scene
+    Refactor  #1289: update CCControlButton: add zoomOnTouchDown property and setPreferredSize
+    Refactor  #1292: modify some function names to make them more readable
+    Refactor  #1336: use CC_DEPRECATED_ATTRIBUTE macro to mark deprecated interfaces
+    Refactor  #1367: change some function names that start with "createWith" to "create"
+ [iOS]
+    Bug       #1290: fix a bug that a project generated by template can not find Shaders folder
+    Bug       #1297: fix a bug that the effect is wrong when using projection 2d and enabling retina
+    Bug       #1299: fix a bug that SimpleAudioEngine::resumeEffect and SimpleAudioEngine::resumeAllEffects will play effects that are played previously
+    Bug       #1315: fix wrong effect of TileMapTest when enabling retina
+    Bug       #1338: fix a crash of CocosdenshionTest when playing effect then clicking HOME menu
+    Bug       #1343: fix a bug of Xcode template
+    Bug       #1364: fix a bug that can not resume background music after pausing it
+    Refactor  #1269: generate project for cocos2dx, then HelloWorld, tests, HelloLua and testjs can refer it
+ [android]
+    Bug       #1239: fix a bug that can not stop effect if play effect with loop mode twice
+    Bug       #1278: fix a  bug that CocosDenshion::unloadEffect() can not stop playing effect
+    Bug       #1322: make CCLabelTTF support vertical alignment
+    Refactor  #1287: make android template's build_native.sh automatically copy new icons
+    Refactor  #1329: move all java files part of engine into a certain directory, then all projects refer them
+ [win32]
+    Bug       #1282: fix a crash that if the display card is ATI
+    Bug       #1344: fix a bug of win32 template
+    Bug       #1365: fix a bug that some files of Resources folder which is copied by build_native.sh will lost authority in cygwin
+    Bug       #1366: fix a crash of tests
+ [lua]
+    Bug       #1369: fix a crash when invoking CCLabelTTF:setPosition(x,y)
+    Feature   #1327: export 'create' method for lua bindings
+
 cocos2d-2.0-rc0a-x-2.0 @May.31 2012
  [all platforms]
     Bug       #1094: fix a bug that nothing will be shown when using CCParticleBatchNode

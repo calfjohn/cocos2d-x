@@ -25,10 +25,7 @@ THE SOFTWARE.
 #include "platform/CCFileUtilsCommon_cpp.h"
 #include <windows.h>
 #include "CCDirector.h"
-
-#define CC_RETINA_DISPLAY_FILENAME_SUFFIX "-hd"
-#define CC_IPAD_FILENAME_SUFFIX "-ipad"
-#define CC_IPAD_DISPLAY_RETINA_SUPPFIX "-ipadhd"
+#include "CCApplication.h"
 
 using namespace std;
 
@@ -41,11 +38,11 @@ static void _CheckPath()
 {
     if (! s_pszResourcePath[0])
     {
-        WCHAR  wszPath[MAX_PATH];
+        WCHAR  wszPath[MAX_PATH] = {0};
         int nNum = WideCharToMultiByte(CP_ACP, 0, wszPath, 
             GetCurrentDirectoryW(sizeof(wszPath), wszPath), 
             s_pszResourcePath, MAX_PATH, NULL, NULL);
-        s_pszResourcePath[nNum] = '\\';
+        s_pszResourcePath[nNum] = '\\'; 
     }
 }
 
@@ -56,6 +53,7 @@ CCFileUtils* CCFileUtils::sharedFileUtils()
     if (s_pFileUtils == NULL)
     {
         s_pFileUtils = new CCFileUtils();
+        _CheckPath();
     }
     return s_pFileUtils;
 }
@@ -75,20 +73,13 @@ void CCFileUtils::purgeCachedEntries()
 
 }
 
-void CCFileUtils::setResourcePath(const char *pszResourcePath)
+const char* CCFileUtils::fullPathFromRelativePath(const char *pszRelativePath)
 {
-    CCAssert(pszResourcePath != NULL, "[FileUtils setResourcePath] -- wrong resource path");
-    CCAssert(strlen(pszResourcePath) <= MAX_PATH, "[FileUtils setResourcePath] -- resource path too long");
+    bool bFileExist = true;
+    const char* resDir = m_obDirectory.c_str();
+    CCString* pRet = CCString::create("");
 
-    strcpy(s_pszResourcePath, pszResourcePath);
-}
-
-const char* CCFileUtils::fullPathFromRelativePath(const char *pszRelativePath, ccResolutionType *pResolutionType)
-{
-    _CheckPath();
-
-    CCString * pRet = new CCString();
-    pRet->autorelease();
+    const std::string& resourceRootPath = CCApplication::sharedApplication()->getResourceRootPath();
     if ((strlen(pszRelativePath) > 1 && pszRelativePath[1] == ':'))
     {
         // path start with "x:", is absolute path
@@ -102,89 +93,44 @@ const char* CCFileUtils::fullPathFromRelativePath(const char *pszRelativePath, c
         pRet->m_sString = szDriver;
         pRet->m_sString += pszRelativePath;
     }
+    else if (resourceRootPath.length() > 0)
+    {
+        pRet->m_sString = resourceRootPath.c_str();
+        pRet->m_sString += m_obDirectory.c_str();
+        pRet->m_sString += pszRelativePath;
+    }
     else
     {
         pRet->m_sString = s_pszResourcePath;
+        pRet->m_sString += resDir;
         pRet->m_sString += pszRelativePath;
     }
 
-    // is ipad?
-    CCSize winSize = CCDirector::sharedDirector()->getWinSize();
-    bool isIpad = (winSize.width == 1024 || winSize.height == 768);
-
-    std::string hiRes = pRet->m_sString.c_str();
-    std::string::size_type pos = hiRes.find_last_of("/\\");
-    std::string::size_type dotPos = hiRes.find_last_of(".");
-    *pResolutionType = kCCResolutioniPhone;
-
-    if (isIpad)
+    // If file or directory doesn't exist, try to find it in the root path.
+    if (GetFileAttributesA(pRet->m_sString.c_str()) == -1)
     {
-        if (CC_CONTENT_SCALE_FACTOR() == 1.0f)
-        {
-            // ipad
+        pRet->m_sString = s_pszResourcePath;
+        pRet->m_sString += pszRelativePath;
 
-            if (std::string::npos != dotPos && dotPos > pos)
-            {
-                hiRes.insert(dotPos, CC_IPAD_FILENAME_SUFFIX);
-            }
-            else
-            {
-                hiRes.append(CC_IPAD_FILENAME_SUFFIX);
-            }
-            
-            *pResolutionType = kCCResolutioniPad;
-        }
-        else
+        if (GetFileAttributesA(pRet->m_sString.c_str()) == -1)
         {
-            // ipad retina
-
-            if (std::string::npos != dotPos && dotPos > pos)
-            {
-                hiRes.insert(dotPos, CC_IPAD_DISPLAY_RETINA_SUPPFIX);
-            }
-            else
-            {
-                hiRes.append(CC_IPAD_DISPLAY_RETINA_SUPPFIX);
-            }
-            
-            *pResolutionType = kCCResolutioniPadRetinaDisplay;
+            bFileExist = false;
         }
     }
-    else
-    {    
-        if (CC_CONTENT_SCALE_FACTOR() != 1.0f)
-        {
-            // iphone retina
 
-            if (std::string::npos != dotPos && dotPos > pos)
-            {
-                hiRes.insert(dotPos, CC_RETINA_DISPLAY_FILENAME_SUFFIX);
-            }
-            else
-            {
-                hiRes.append(CC_RETINA_DISPLAY_FILENAME_SUFFIX);
-            }
-            
-            *pResolutionType = kCCResolutioniPhoneRetinaDisplay;
-        }
-    }  
-
-    DWORD attrib = GetFileAttributesA(hiRes.c_str());
-    if (attrib != INVALID_FILE_ATTRIBUTES && ! (FILE_ATTRIBUTE_DIRECTORY & attrib))
-    {
-        pRet->m_sString.swap(hiRes);
+    if (!bFileExist)
+    { // Can't find the file, return the relative path.
+        pRet->m_sString = pszRelativePath;
     }
-
+   
     return pRet->m_sString.c_str();
 }
 
 const char *CCFileUtils::fullPathFromRelativeFile(const char *pszFilename, const char *pszRelativeFile)
 {
-    _CheckPath();
     // std::string relativeFile = fullPathFromRelativePath(pszRelativeFile);
     std::string relativeFile = pszRelativeFile;
-    CCString *pRet = new CCString();
-    pRet->autorelease();
+    CCString *pRet = CCString::create("");
     pRet->m_sString = relativeFile.substr(0, relativeFile.find_last_of("/\\") + 1);
     pRet->m_sString += pszFilename;
     return pRet->m_sString.c_str();

@@ -35,7 +35,7 @@ THE SOFTWARE.
 #include "textures/CCTextureCache.h"
 #include "platform/CCFileUtils.h"
 #include "CCGL.h"
-#include "extensions/CCNotificationCenter/CCNotificationCenter.h"
+#include "support/CCNotificationCenter.h"
 #include "CCEventType.h"
 // extern
 #include "kazmath/GL/matrix.h"
@@ -54,7 +54,7 @@ CCRenderTexture::CCRenderTexture()
 {
     // Listen this event to save render texture before come to background.
     // Then it can be restored after coming to foreground on Android.
-    extension::CCNotificationCenter::sharedNotificationCenter()->addObserver(this,
+    CCNotificationCenter::sharedNotificationCenter()->addObserver(this,
                                                                              callfuncO_selector(CCRenderTexture::listenToBackground),
                                                                              EVENT_COME_TO_BACKGROUND,
                                                                              NULL);
@@ -69,7 +69,7 @@ CCRenderTexture::~CCRenderTexture()
     }
     CC_SAFE_DELETE(m_pUITextureImage);
     
-    extension::CCNotificationCenter::sharedNotificationCenter()->removeObserver(this, EVENT_COME_TO_BACKGROUND);
+    CCNotificationCenter::sharedNotificationCenter()->removeObserver(this, EVENT_COME_TO_BACKGROUND);
 }
 
 void CCRenderTexture::listenToBackground(cocos2d::CCObject *obj)
@@ -194,11 +194,13 @@ bool CCRenderTexture::initWithWidthAndHeight(int w, int h, CCTexture2DPixelForma
         m_ePixelFormat = eFormat;
 
         m_pTexture = new CCTexture2D();
-        CC_BREAK_IF(! m_pTexture);
-
-        m_pTexture->initWithData(data, (CCTexture2DPixelFormat)m_ePixelFormat, powW, powH, CCSizeMake((float)w, (float)h));
-        free( data );
-
+        if (m_pTexture) {
+                m_pTexture->initWithData(data, (CCTexture2DPixelFormat)m_ePixelFormat, powW, powH, CCSizeMake((float)w, (float)h));
+                free( data );
+        } else {
+                free( data );  // ScopeGuard (a simulated Finally clause) would be more elegant.
+                break;
+        }
         GLint oldRBO;
         glGetIntegerv(GL_RENDERBUFFER_BINDING, &oldRBO);
 
@@ -214,7 +216,7 @@ bool CCRenderTexture::initWithWidthAndHeight(int w, int h, CCTexture2DPixelForma
             //create and attach depth buffer
             glGenRenderbuffers(1, &m_uDepthRenderBufffer);
             glBindRenderbuffer(GL_RENDERBUFFER, m_uDepthRenderBufffer);
-            glRenderbufferStorage(GL_RENDERBUFFER, uDepthStencilFormat, powW, powH);
+            glRenderbufferStorage(GL_RENDERBUFFER, uDepthStencilFormat, (GLsizei)powW, (GLsizei)powH);
             glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_uDepthRenderBufffer);
 
             // if depth format is the one with stencil part, bind same render buffer as stencil attachment
@@ -228,7 +230,7 @@ bool CCRenderTexture::initWithWidthAndHeight(int w, int h, CCTexture2DPixelForma
 
         m_pTexture->setAliasTexParameters();
 
-        m_pSprite = CCSprite::create(m_pTexture);
+        m_pSprite = CCSprite::createWithTexture(m_pTexture);
 
         m_pTexture->release();
         m_pSprite->setScaleY(-1);

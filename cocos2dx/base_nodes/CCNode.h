@@ -35,6 +35,7 @@
 #include "shaders/ccGLStateCache.h"
 #include "shaders/CCGLProgram.h"
 #include "kazmath/kazmath.h"
+#include "script_support/CCScriptSupport.h"
 
 NS_CC_BEGIN
 
@@ -59,7 +60,9 @@ enum {
 
 enum {
     kCCNodeOnEnter,
-    kCCNodeOnExit
+    kCCNodeOnExit,
+    kCCNodeOnEnterTransitionDidFinish,
+    kCCNodeOnExitTransitionDidStart
 };
 
 /** @brief CCNode is the main element. Anything thats gets drawn or contains things that get drawn is a CCNode.
@@ -227,7 +230,7 @@ public:
      All nodes has a size. Layer and Scene has the same size of the screen.
      @since v0.8
      */
-    CC_PROPERTY(CCSize, m_tContentSize, ContentSize)
+    CC_PROPERTY_PASS_BY_REF(CCSize, m_tContentSize, ContentSize)
 
     /** whether or not the node is running */
     bool m_bIsRunning;
@@ -275,6 +278,8 @@ public:
      */
     CC_PROPERTY(CCScheduler*, m_pScheduler, Scheduler);
 
+    inline int getScriptHandler() { return m_nScriptHandler; };
+
 protected:
 
     // transform
@@ -285,7 +290,7 @@ protected:
     bool m_bIsInverseDirty;
     bool m_bReorderChildDirty;
     int m_nScriptHandler;
-
+    ccScriptType m_eScriptType;
 private:
     //! lazy allocs
     void childrenAlloc(void);

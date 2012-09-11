@@ -251,7 +251,7 @@ static void cc_utf8_trim_ws(std::vector<unsigned short>* str)
  *
  * Return value: the length of the string in characters
  **/
-static long
+long
 cc_utf8_strlen (const char * p, int max)
 {
   long len = 0;
@@ -663,17 +663,17 @@ void CCBMFontConfiguration::parseCharacterDefinition(std::string line, ccBMFontD
     index = line.find("xoffset=");
     index2 = line.find(' ', index);
     value = line.substr(index, index2-index);
-    sscanf(value.c_str(), "xoffset=%d", &characterDefinition->xOffset);
+    sscanf(value.c_str(), "xoffset=%hd", &characterDefinition->xOffset);
     // Character yoffset
     index = line.find("yoffset=");
     index2 = line.find(' ', index);
     value = line.substr(index, index2-index);
-    sscanf(value.c_str(), "yoffset=%d", &characterDefinition->yOffset);
+    sscanf(value.c_str(), "yoffset=%hd", &characterDefinition->yOffset);
     // Character xadvance
     index = line.find("xadvance=");
     index2 = line.find(' ', index);
     value = line.substr(index, index2-index);
-    sscanf(value.c_str(), "xadvance=%d", &characterDefinition->xAdvance);
+    sscanf(value.c_str(), "xadvance=%hd", &characterDefinition->xAdvance);
 }
 
 void CCBMFontConfiguration::parseKerningEntry(std::string line)
@@ -842,7 +842,7 @@ void CCLabelBMFont::createFontChars()
 {
     int nextFontPositionX = 0;
     int nextFontPositionY = 0;
-    unsigned short prev = -1;
+    //unsigned short prev = -1;
     int kerningAmount = 0;
 
     CCSize tmpSize = CCSizeZero;
@@ -924,7 +924,7 @@ void CCLabelBMFont::createFontChars()
 
         // update kerning
         nextFontPositionX += fontDef.xAdvance + kerningAmount;
-        prev = c;
+        //prev = c;
 
         // Apply label properties
         fontChar->setOpacityModifyRGB(m_bIsOpacityModifyRGB);
@@ -1070,7 +1070,7 @@ bool CCLabelBMFont::isOpacityModifyRGB()
 // LabelBMFont - AnchorPoint
 void CCLabelBMFont::setAnchorPoint(const CCPoint& point)
 {
-    if( ! CCPoint::CCPointEqualToPoint(point, m_tAnchorPoint) )
+    if( ! point.equals(m_tAnchorPoint))
     {
         CCSpriteBatchNode::setAnchorPoint(point);
         updateLabel();
@@ -1260,6 +1260,12 @@ void CCLabelBMFont::updateLabel()
             {
                 float lineWidth = 0.0f;
                 unsigned int line_length = last_line.size();
+				// if last line is empty we must just increase lineNumber and work with next line
+                if (line_length == 0)
+                {
+                    lineNumber++;
+                    continue;
+                }
                 int index = i + line_length - 1 + lineNumber;
                 if (index < 0) continue;
 

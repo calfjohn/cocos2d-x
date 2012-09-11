@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "touch_dispatcher/CCTouchDispatcher.h"
 #include "text_input_node/CCIMEDispatcher.h"
 #include "keypad_dispatcher/CCKeypadDispatcher.h"
+#include "support/CCPointExtension.h"
 #include "CCApplication.h"
 
 NS_CC_BEGIN
@@ -88,8 +89,14 @@ CCEGLView::CCEGLView()
 , m_hDC(NULL)
 , m_hRC(NULL)
 , m_lpfnAccelerometerKeyHook(NULL)
+, m_menu(NULL)
+, m_wndproc(NULL)
+, m_windowWidth(0)
+, m_windowHeight(0)
+, m_windowTouchScaleX(1.0f)
+, m_windowTouchScaleY(1.0f)
 {
-    
+    strcpy(m_szViewName, "Cocos2dxWin32");
 }
 
 CCEGLView::~CCEGLView()
@@ -161,7 +168,7 @@ bool CCEGLView::Create(LPCTSTR pTitle, int w, int h)
         wc.hIcon          = LoadIcon( NULL, IDI_WINLOGO );    // Load The Default Icon
         wc.hCursor        = LoadCursor( NULL, IDC_ARROW );    // Load The Arrow Pointer
         wc.hbrBackground  = NULL;                           // No Background Required For GL
-        wc.lpszMenuName   = NULL;                           // We Don't Want A Menu
+        wc.lpszMenuName   = m_menu;                         // 
         wc.lpszClassName  = kWindowClassName;               // Set The Class Name
 
         CC_BREAK_IF(! RegisterClass(&wc) && 1410 != GetLastError());        
@@ -203,6 +210,8 @@ bool CCEGLView::Create(LPCTSTR pTitle, int w, int h)
 
 LRESULT CCEGLView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
+    BOOL bProcessed = FALSE;
+
     switch (message)
     {
     case WM_LBUTTONDOWN:
@@ -210,11 +219,14 @@ LRESULT CCEGLView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
         {
             POINT point = {(short)LOWORD(lParam), (short)HIWORD(lParam)};
             CCPoint pt(point.x/CC_CONTENT_SCALE_FACTOR(), point.y/CC_CONTENT_SCALE_FACTOR());
-            if (CCRect::CCRectContainsPoint(m_rcViewPort, pt))
+            CCPoint tmp = ccp(pt.x, m_obScreenSize.height - pt.y);
+            if (m_obViewPortRect.equals(CCRectZero) || m_obViewPortRect.containsPoint(tmp))
             {
                 m_bCaptured = true;
                 SetCapture(m_hWnd);
                 int id = 0;
+                pt.x *= m_windowTouchScaleX;
+                pt.y *= m_windowTouchScaleY;
                 handleTouchesBegin(1, &id, &pt.x, &pt.y);
             }
         }
@@ -226,6 +238,8 @@ LRESULT CCEGLView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
             POINT point = {(short)LOWORD(lParam), (short)HIWORD(lParam)};
             CCPoint pt(point.x/CC_CONTENT_SCALE_FACTOR(), point.y/CC_CONTENT_SCALE_FACTOR());
             int id = 0;
+            pt.x *= m_windowTouchScaleX;
+            pt.y *= m_windowTouchScaleY;
             handleTouchesMove(1, &id, &pt.x, &pt.y);
         }
         break;
@@ -236,6 +250,8 @@ LRESULT CCEGLView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
             POINT point = {(short)LOWORD(lParam), (short)HIWORD(lParam)};
             CCPoint pt(point.x/CC_CONTENT_SCALE_FACTOR(), point.y/CC_CONTENT_SCALE_FACTOR());
             int id = 0;
+            pt.x *= m_windowTouchScaleX;
+            pt.y *= m_windowTouchScaleY;
             handleTouchesEnd(1, &id, &pt.x, &pt.y);
 
             ReleaseCapture();
@@ -246,10 +262,10 @@ LRESULT CCEGLView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
         switch (wParam)
         {
         case SIZE_RESTORED:
-            CCApplication::sharedApplication().applicationWillEnterForeground();
+            CCApplication::sharedApplication()->applicationWillEnterForeground();
             break;
         case SIZE_MINIMIZED:
-            CCApplication::sharedApplication().applicationDidEnterBackground();
+            CCApplication::sharedApplication()->applicationDidEnterBackground();
             break;
         }
         break;
@@ -290,7 +306,7 @@ LRESULT CCEGLView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
                 else if (VK_ESCAPE == wParam)
                 {
                     // ESC input
-                    CCDirector::sharedDirector()->end();
+                    //CCDirector::sharedDirector()->end();
                 }
             }
             else if (wParam < 128)
@@ -326,7 +342,18 @@ LRESULT CCEGLView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
         break;
 
     default:
+        if (m_wndproc)
+        {
+            
+            m_wndproc(message, wParam, lParam, &bProcessed);
+            if (bProcessed) break;
+        }
         return DefWindowProc(m_hWnd, message, wParam, lParam);
+    }
+
+    if (m_wndproc && !bProcessed)
+    {
+        m_wndproc(message, wParam, lParam, &bProcessed);
     }
     return 0;
 }
@@ -368,6 +395,22 @@ void CCEGLView::setIMEKeyboardState(bool /*bOpen*/)
 
 }
 
+bool CCEGLView::enableRetina()
+{
+    m_bIsRetinaEnabled = true;
+    return true;
+}
+
+void CCEGLView::setMenuResource(LPCWSTR menu)
+{
+    m_menu = menu;
+}
+
+void CCEGLView::setWndProc(CUSTOM_WND_PROC proc)
+{
+    m_wndproc = proc;
+}
+
 HWND CCEGLView::getHWnd()
 {
     return m_hWnd;
@@ -380,27 +423,48 @@ void CCEGLView::resize(int width, int height)
         return;
     }
 
+    RECT rcWindow;
+    GetWindowRect(m_hWnd, &rcWindow);
+
     RECT rcClient;
     GetClientRect(m_hWnd, &rcClient);
-    if (rcClient.right - rcClient.left == width &&
-        rcClient.bottom - rcClient.top == height)
-    {
-        return;
-    }
+
     // calculate new window width and height
+    POINT ptDiff;
+    ptDiff.x = (rcWindow.right - rcWindow.left) - rcClient.right;
+    ptDiff.y = (rcWindow.bottom - rcWindow.top) - rcClient.bottom;
     rcClient.right = rcClient.left + width;
     rcClient.bottom = rcClient.top + height;
+
+    m_windowWidth = width;
+    m_windowHeight = height;
+    const CCSize& frameSize = getFrameSize();
+    if (frameSize.width > 0)
+    {
+        m_windowTouchScaleX = frameSize.width / width;
+        m_windowTouchScaleY = frameSize.height / height;
+
+        TCHAR buff[MAX_PATH + 1];
+        memset(buff, 0, sizeof(buff));
+        swprintf_s(buff, MAX_PATH, L"%s - %0.0fx%0.0f - %0.2f",
+                   kWindowClassName, frameSize.width, frameSize.height, 1.0f / m_windowTouchScaleX);
+        SetWindowText(m_hWnd, buff);
+    }
+        
     AdjustWindowRectEx(&rcClient, GetWindowLong(m_hWnd, GWL_STYLE), false, GetWindowLong(m_hWnd, GWL_EXSTYLE));
 
     // change width and height
-    SetWindowPos(m_hWnd, 0, 0, 0, rcClient.right - rcClient.left, 
-        rcClient.bottom - rcClient.top, SWP_NOCOPYBITS | SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER);
+    SetWindowPos(m_hWnd, 0, 0, 0, width + ptDiff.x, height + ptDiff.y,
+                 SWP_NOCOPYBITS | SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER);
 }
 
 void CCEGLView::setFrameSize(float width, float height)
 {
     Create((LPCTSTR)m_szViewName, (int)width, (int)height);
     CCEGLViewProtocol::setFrameSize(width, height);
+
+    resize(width, height); // adjust window size for menubar
+    centerWindow();
 }
 
 void CCEGLView::centerWindow()
@@ -435,26 +499,23 @@ void CCEGLView::centerWindow()
     SetWindowPos(m_hWnd, 0, offsetX, offsetY, 0, 0, SWP_NOCOPYBITS | SWP_NOSIZE | SWP_NOOWNERZORDER | SWP_NOZORDER);
 }
 
-bool CCEGLView::canSetContentScaleFactor()
+bool CCEGLView::setContentScaleFactor(float contentScaleFactor)
 {
+    CCEGLViewProtocol::setContentScaleFactor(contentScaleFactor);
+    resize((int)(m_obScreenSize.width * contentScaleFactor), (int)(m_obScreenSize.height * contentScaleFactor));
+    centerWindow();
+    
     return true;
 }
 
-void CCEGLView::setContentScaleFactor(float contentScaleFactor)
-{
-    CCEGLViewProtocol::setContentScaleFactor(contentScaleFactor);
-    resize((int)(m_sSizeInPixel.width * contentScaleFactor), (int)(m_sSizeInPixel.height * contentScaleFactor));
-    centerWindow();
-}
-
-CCEGLView& CCEGLView::sharedOpenGLView()
+CCEGLView* CCEGLView::sharedOpenGLView()
 {
     static CCEGLView* s_pEglView = NULL;
     if (s_pEglView == NULL)
     {
         s_pEglView = new CCEGLView();
     }
-    return *s_pEglView;
+    return s_pEglView;
 }
 
 NS_CC_END

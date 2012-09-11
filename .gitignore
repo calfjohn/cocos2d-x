@@ -27,6 +27,8 @@ obj/
 [Rr]elease*/
 _ReSharper*/
 [Tt]est[Rr]esult*
+ipch/
+*.opensdf
 
 # Ignore files build by ndk and eclipse
 libs/
@@ -41,6 +43,9 @@ local.properties
 
 # Ignore files build by linux
 *.o
+
+# Ignore python compiled files
+*.pyc
 
 # Ignore files build by airplay
 build_*_xcode/

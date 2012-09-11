@@ -70,9 +70,10 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 #import "CCTouch.h"
 #import "CCIMEDispatcher.h"
 #import "OpenGL_Internal.h"
-
+#import "CCEGLView.h"
 //CLASS IMPLEMENTATIONS:
 
+#define IOS_MAX_TOUCHES_COUNT     10
 
 static EAGLView *view = 0;
 
@@ -87,7 +88,8 @@ static EAGLView *view = 0;
 @synthesize pixelFormat=pixelformat_, depthFormat=depthFormat_;
 @synthesize context=context_;
 @synthesize multiSampling=multiSampling_;
-
+@synthesize isKeyboardShown=isKeyboardShown_;
+@synthesize keyboardShowNotification = keyboardShowNotification_;
 + (Class) layerClass
 {
     return [CAEAGLLayer class];
@@ -132,6 +134,7 @@ static EAGLView *view = 0;
 {
     if((self = [super initWithFrame:frame]))
     {
+        isUseUITextField = YES;
         pixelformat_ = format;
         depthFormat_ = depth;
         multiSampling_ = sampling;
@@ -145,6 +148,9 @@ static EAGLView *view = 0;
 
         
         view = self;
+        
+        originalRect_ = self.frame;
+        self.keyboardShowNotification = nil;
     }
         
     return self;
@@ -237,6 +243,7 @@ static EAGLView *view = 0;
 - (void) dealloc
 {
     [renderer_ release];
+    self.keyboardShowNotification = NULL; // implicit release
     [super dealloc];
 }
 
@@ -359,14 +366,37 @@ static EAGLView *view = 0;
         return ret;
 }
 
+
+-(void) handleTouchesAfterKeyboardShow
+{
+    NSArray *subviews = self.subviews;
+    
+    for(UIView* view in subviews)
+    {
+        if([view isKindOfClass:NSClassFromString(@"CustomUITextField")])
+        {
+            if ([view isFirstResponder])
+            {
+                [view resignFirstResponder];
+                return;
+            }
+        }
+    }
+}
+
 // Pass the touches to the superview
 #pragma mark EAGLView - Touch Delegate
-
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    int ids[CC_MAX_TOUCHES] = {0};
-    float xs[CC_MAX_TOUCHES] = {0.0f};
-    float ys[CC_MAX_TOUCHES] = {0.0f};
+    if (isKeyboardShown_)
+    {
+        [self handleTouchesAfterKeyboardShow];
+        return;
+    }
+    
+    int ids[IOS_MAX_TOUCHES_COUNT] = {0};
+    float xs[IOS_MAX_TOUCHES_COUNT] = {0.0f};
+    float ys[IOS_MAX_TOUCHES_COUNT] = {0.0f};
     
     int i = 0;
     for (UITouch *touch in touches) {
@@ -375,14 +405,18 @@ static EAGLView *view = 0;
         ys[i] = [touch locationInView: [touch view]].y;
         ++i;
     }
-    cocos2d::CCEGLView::sharedOpenGLView().handleTouchesBegin(i, ids, xs, ys);
+    cocos2d::CCEGLView::sharedOpenGLView()->handleTouchesBegin(i, ids, xs, ys);
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    int ids[CC_MAX_TOUCHES] = {0};
-    float xs[CC_MAX_TOUCHES] = {0.0f};
-    float ys[CC_MAX_TOUCHES] = {0.0f};
+    if (isKeyboardShown_)
+    {
+        return;
+    }
+    int ids[IOS_MAX_TOUCHES_COUNT] = {0};
+    float xs[IOS_MAX_TOUCHES_COUNT] = {0.0f};
+    float ys[IOS_MAX_TOUCHES_COUNT] = {0.0f};
     
     int i = 0;
     for (UITouch *touch in touches) {
@@ -391,14 +425,19 @@ static EAGLView *view = 0;
         ys[i] = [touch locationInView: [touch view]].y;
         ++i;
     }
-    cocos2d::CCEGLView::sharedOpenGLView().handleTouchesMove(i, ids, xs, ys);
+    cocos2d::CCEGLView::sharedOpenGLView()->handleTouchesMove(i, ids, xs, ys);
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    int ids[CC_MAX_TOUCHES] = {0};
-    float xs[CC_MAX_TOUCHES] = {0.0f};
-    float ys[CC_MAX_TOUCHES] = {0.0f};
+    if (isKeyboardShown_)
+    {
+        return;
+    }
+    
+    int ids[IOS_MAX_TOUCHES_COUNT] = {0};
+    float xs[IOS_MAX_TOUCHES_COUNT] = {0.0f};
+    float ys[IOS_MAX_TOUCHES_COUNT] = {0.0f};
     
     int i = 0;
     for (UITouch *touch in touches) {
@@ -407,14 +446,19 @@ static EAGLView *view = 0;
         ys[i] = [touch locationInView: [touch view]].y;
         ++i;
     }
-    cocos2d::CCEGLView::sharedOpenGLView().handleTouchesEnd(i, ids, xs, ys);
+    cocos2d::CCEGLView::sharedOpenGLView()->handleTouchesEnd(i, ids, xs, ys);
 }
     
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    int ids[CC_MAX_TOUCHES] = {0};
-    float xs[CC_MAX_TOUCHES] = {0.0f};
-    float ys[CC_MAX_TOUCHES] = {0.0f};
+    if (isKeyboardShown_)
+    {
+        return;
+    }
+    
+    int ids[IOS_MAX_TOUCHES_COUNT] = {0};
+    float xs[IOS_MAX_TOUCHES_COUNT] = {0.0f};
+    float ys[IOS_MAX_TOUCHES_COUNT] = {0.0f};
     
     int i = 0;
     for (UITouch *touch in touches) {
@@ -423,7 +467,7 @@ static EAGLView *view = 0;
         ys[i] = [touch locationInView: [touch view]].y;
         ++i;
     }
-    cocos2d::CCEGLView::sharedOpenGLView().handleTouchesCancel(i, ids, xs, ys);
+    cocos2d::CCEGLView::sharedOpenGLView()->handleTouchesCancel(i, ids, xs, ys);
 }
 
 #pragma mark -
@@ -435,11 +479,28 @@ static EAGLView *view = 0;
         [markedText_ release];
     }
     markedText_ = nil;
+    if (isUseUITextField)
+    {
+        return NO;
+    }
     return YES;
+}
+
+- (BOOL)becomeFirstResponder
+{
+    isUseUITextField = NO;
+    return [super becomeFirstResponder];
+}
+
+- (BOOL)resignFirstResponder
+{
+    isUseUITextField = YES;
+    return [super resignFirstResponder];
 }
 
 #pragma mark -
 #pragma mark UIKeyInput protocol
+
 
 - (BOOL)hasText
 {
@@ -588,7 +649,7 @@ static EAGLView *view = 0;
 - (NSComparisonResult)comparePosition:(UITextPosition *)position toPosition:(UITextPosition *)other;
 {
     CCLOG("comparePosition");
-    return 0;
+    return (NSComparisonResult)0;
 }
 - (NSInteger)offsetFromPosition:(UITextPosition *)from toPosition:(UITextPosition *)toPosition;
 {
@@ -724,19 +785,47 @@ static EAGLView *view = 0;
         default:
             break;
     }
+    
     cocos2d::CCIMEKeyboardNotificationInfo notiInfo;
     notiInfo.begin = cocos2d::CCRect(begin.origin.x,
                                      begin.origin.y,
-                                     begin.size.width, 
+                                     begin.size.width,
                                      begin.size.height);
     notiInfo.end = cocos2d::CCRect(end.origin.x,
                                    end.origin.y,
-                                   end.size.width, 
+                                   end.size.width,
                                    end.size.height);
     notiInfo.duration = (float)aniDuration;
+    
+    float offestY = cocos2d::CCEGLView::sharedOpenGLView()->getViewPortRect().origin.y;
+    
+    if (offestY > 0.0f)
+    {
+        notiInfo.begin.origin.y += offestY;
+        notiInfo.begin.size.height -= offestY;
+        notiInfo.end.size.height -= offestY;
+    }
+    
+    if (!cocos2d::CCEGLView::sharedOpenGLView()->isRetinaEnabled())
+    {
+        float scaleX = cocos2d::CCEGLView::sharedOpenGLView()->getScaleX();
+        float scaleY = cocos2d::CCEGLView::sharedOpenGLView()->getScaleY();
+        
+        notiInfo.begin.origin.x /= scaleX;
+        notiInfo.begin.origin.y /= scaleY;
+        notiInfo.begin.size.width /= scaleX;
+        notiInfo.begin.size.height /= scaleY;
+        
+        notiInfo.end.origin.x /= scaleX;
+        notiInfo.end.origin.y /= scaleY;
+        notiInfo.end.size.width /= scaleX;
+        notiInfo.end.size.height /= scaleY;
+    }
+    
     cocos2d::CCIMEDispatcher* dispatcher = cocos2d::CCIMEDispatcher::sharedDispatcher();
     if (UIKeyboardWillShowNotification == type) 
     {
+        self.keyboardShowNotification = notif; // implicit copy
         dispatcher->dispatchKeyboardWillShow(notiInfo);
     }
     else if (UIKeyboardDidShowNotification == type)
@@ -746,6 +835,7 @@ static EAGLView *view = 0;
         caretRect_ = end;
         caretRect_.origin.y = viewSize.height - (caretRect_.origin.y + caretRect_.size.height + [UIFont smallSystemFontSize]);
         caretRect_.size.height = 0;
+        isKeyboardShown_ = YES;
     }
     else if (UIKeyboardWillHideNotification == type)
     {
@@ -755,6 +845,58 @@ static EAGLView *view = 0;
     {
         caretRect_ = CGRectZero;
         dispatcher->dispatchKeyboardDidHide(notiInfo);
+        isKeyboardShown_ = NO;
     }
 }
+
+-(void) doAnimationWhenKeyboardMoveWithDuration:(float)duration distance:(float)dis
+{
+    [UIView beginAnimations:nil context:NULL];
+	[UIView setAnimationDelegate:self];
+	[UIView setAnimationDuration:duration];
+	[UIView setAnimationBeginsFromCurrentState:YES];
+    
+    // NSLog(@"[animation] dis = %f\n", dis);
+    
+    if (dis < 0.0f) dis = 0.0f;
+
+    if (!cocos2d::CCEGLView::sharedOpenGLView()->isRetinaEnabled())
+    {
+        dis *= cocos2d::CCEGLView::sharedOpenGLView()->getScaleY();
+    }
+    
+    switch ([[UIApplication sharedApplication] statusBarOrientation])
+    {
+        case UIInterfaceOrientationPortrait:
+            self.frame = CGRectMake(originalRect_.origin.x, originalRect_.origin.y - dis, originalRect_.size.width, originalRect_.size.height);
+            break;
+            
+        case UIInterfaceOrientationPortraitUpsideDown:
+            self.frame = CGRectMake(originalRect_.origin.x, originalRect_.origin.y + dis, originalRect_.size.width, originalRect_.size.height);
+            break;
+            
+        case UIInterfaceOrientationLandscapeLeft:
+            self.frame = CGRectMake(originalRect_.origin.x - dis, originalRect_.origin.y , originalRect_.size.width, originalRect_.size.height);
+            break;
+            
+        case UIInterfaceOrientationLandscapeRight:
+            self.frame = CGRectMake(originalRect_.origin.x + dis, originalRect_.origin.y , originalRect_.size.width, originalRect_.size.height);
+            break;
+            
+        default:
+            break;
+    }
+    
+	[UIView commitAnimations];
+}
+
+
+-(void) doAnimationWhenAnotherEditBeClicked
+{
+    if (self.keyboardShowNotification != nil)
+    {
+        [[NSNotificationCenter defaultCenter]postNotification:self.keyboardShowNotification];
+    }
+}
+
 @end

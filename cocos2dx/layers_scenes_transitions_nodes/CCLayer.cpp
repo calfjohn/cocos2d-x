@@ -1,3 +1,4 @@
+
 /****************************************************************************
 Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2008-2010 Ricardo Quesada
@@ -98,6 +99,7 @@ CCLayer *CCLayer::create()
 void CCLayer::registerWithTouchDispatcher()
 {
     CCDirector* pDirector = CCDirector::sharedDirector();
+
     if (m_pScriptHandlerEntry)
     {
         if (m_pScriptHandlerEntry->isMultiTouches())
@@ -108,19 +110,20 @@ void CCLayer::registerWithTouchDispatcher()
         else
         {
             pDirector->getTouchDispatcher()->addTargetedDelegate(this,
-                                                                       m_pScriptHandlerEntry->getPriority(),
-                                                                       m_pScriptHandlerEntry->getSwallowsTouches());
+								 m_pScriptHandlerEntry->getPriority(),
+								 m_pScriptHandlerEntry->getSwallowsTouches());
             LUALOG("[LUA] Add touch event handler: %d", m_pScriptHandlerEntry->getHandler());
         }
         return;
     }
-    pDirector->getTouchDispatcher()->addStandardDelegate(this,0);
+
+    pDirector->getTouchDispatcher()->addStandardDelegate(this, 0);
 }
 
 void CCLayer::registerScriptTouchHandler(int nHandler, bool bIsMultiTouches, int nPriority, bool bSwallowsTouches)
 {
     unregisterScriptTouchHandler();
-    m_pScriptHandlerEntry = CCTouchScriptHandlerEntry::entryWithHandler(nHandler, bIsMultiTouches, nPriority, bSwallowsTouches);
+    m_pScriptHandlerEntry = CCTouchScriptHandlerEntry::create(nHandler, bIsMultiTouches, nPriority, bSwallowsTouches);
     m_pScriptHandlerEntry->retain();
 }
 
@@ -135,12 +138,12 @@ void CCLayer::unregisterScriptTouchHandler(void)
 
 int CCLayer::excuteScriptTouchHandler(int nEventType, CCTouch *pTouch)
 {
-    return CCScriptEngineManager::sharedManager()->getScriptEngine()->executeTouchEvent(m_pScriptHandlerEntry->getHandler(), nEventType, pTouch);
+    return CCScriptEngineManager::sharedManager()->getScriptEngine()->executeLayerTouchEvent(this, nEventType, pTouch);
 }
 
 int CCLayer::excuteScriptTouchHandler(int nEventType, CCSet *pTouches)
 {
-    return CCScriptEngineManager::sharedManager()->getScriptEngine()->executeTouchesEvent(m_pScriptHandlerEntry->getHandler(), nEventType, pTouches);
+    return CCScriptEngineManager::sharedManager()->getScriptEngine()->executeLayerTouchesEvent(this, nEventType, pTouches);
 }
 
 /// isTouchEnabled getter
@@ -288,92 +291,102 @@ void CCLayer::onEnterTransitionDidFinish()
 
 bool CCLayer::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 {
-    if (m_pScriptHandlerEntry)
+    if (kScriptTypeNone != m_eScriptType)
     {
         return excuteScriptTouchHandler(CCTOUCHBEGAN, pTouch) == 0 ? false : true;
     }
+
     CC_UNUSED_PARAM(pTouch);
     CC_UNUSED_PARAM(pEvent);
     CCAssert(false, "Layer#ccTouchBegan override me");
     return true;
 }
 
-void CCLayer::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent) {
-    if (m_pScriptHandlerEntry)
+void CCLayer::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
+{
+    if (kScriptTypeNone != m_eScriptType)
     {
         excuteScriptTouchHandler(CCTOUCHMOVED, pTouch);
         return;
     }
+
     CC_UNUSED_PARAM(pTouch);
     CC_UNUSED_PARAM(pEvent);
 }
     
-void CCLayer::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent) {
-    if (m_pScriptHandlerEntry)
+void CCLayer::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
+{
+    if (kScriptTypeNone != m_eScriptType)
     {
         excuteScriptTouchHandler(CCTOUCHENDED, pTouch);
         return;
     }
+
     CC_UNUSED_PARAM(pTouch);
     CC_UNUSED_PARAM(pEvent);
 }
 
-void CCLayer::ccTouchCancelled(CCTouch *pTouch, CCEvent *pEvent) {
-    if (m_pScriptHandlerEntry)
+void CCLayer::ccTouchCancelled(CCTouch *pTouch, CCEvent *pEvent)
+{
+    if (kScriptTypeNone != m_eScriptType)
     {
         excuteScriptTouchHandler(CCTOUCHCANCELLED, pTouch);
         return;
     }
+
     CC_UNUSED_PARAM(pTouch);
     CC_UNUSED_PARAM(pEvent);
 }    
 
 void CCLayer::ccTouchesBegan(CCSet *pTouches, CCEvent *pEvent)
 {
-    if (m_pScriptHandlerEntry)
+    if (kScriptTypeNone != m_eScriptType)
     {
         excuteScriptTouchHandler(CCTOUCHBEGAN, pTouches);
         return;
     }
+
     CC_UNUSED_PARAM(pTouches);
     CC_UNUSED_PARAM(pEvent);
 }
 
 void CCLayer::ccTouchesMoved(CCSet *pTouches, CCEvent *pEvent)
 {
-    if (m_pScriptHandlerEntry)
+    if (kScriptTypeNone != m_eScriptType)
     {
         excuteScriptTouchHandler(CCTOUCHMOVED, pTouches);
         return;
     }
+
     CC_UNUSED_PARAM(pTouches);
     CC_UNUSED_PARAM(pEvent);
 }
 
 void CCLayer::ccTouchesEnded(CCSet *pTouches, CCEvent *pEvent)
 {
-    if (m_pScriptHandlerEntry)
+    if (kScriptTypeNone != m_eScriptType)
     {
         excuteScriptTouchHandler(CCTOUCHENDED, pTouches);
         return;
     }
+
     CC_UNUSED_PARAM(pTouches);
     CC_UNUSED_PARAM(pEvent);
 }
 
 void CCLayer::ccTouchesCancelled(CCSet *pTouches, CCEvent *pEvent)
 {
-    if (m_pScriptHandlerEntry)
+    if (kScriptTypeNone != m_eScriptType)
     {
         excuteScriptTouchHandler(CCTOUCHCANCELLED, pTouches);
         return;
     }
+
     CC_UNUSED_PARAM(pTouches);
     CC_UNUSED_PARAM(pEvent);
 }
 
 /// ColorLayer
-
 
 CCLayerColor::CCLayerColor()
 : m_cOpacity(0)
@@ -500,7 +513,7 @@ bool CCLayerColor::initWithColor(const ccColor4B& color)
 }
 
 /// override contentSize
-void CCLayerColor::setContentSize(const CCSize& size)
+void CCLayerColor::setContentSize(const CCSize & size)
 {
     m_pSquareVertices[1].x = size.width;
     m_pSquareVertices[2].y = size.height;
@@ -558,6 +571,7 @@ void CCLayerColor::draw()
 //
 // CCLayerGradient
 // 
+
 CCLayerGradient* CCLayerGradient::layerWithColor(const ccColor4B& start, const ccColor4B& end)
 {
     return CCLayerGradient::create(start, end);
@@ -797,7 +811,7 @@ void CCLayerMultiplex::addLayer(CCLayer* layer)
 
 bool CCLayerMultiplex::initWithLayers(CCLayer *layer, va_list params)
 {
-    m_pLayers = CCArray::create(5);
+    m_pLayers = CCArray::createWithCapacity(5);
     m_pLayers->retain();
 
     m_pLayers->addObject(layer);

@@ -146,7 +146,6 @@ bool CCGridBase::initWithSize(const ccGridSize& gridSize)
     if (! pTexture)
     {
         CCLOG("cocos2d: CCGrid: error creating texture");
-        delete this;
         return false;
     }
 
@@ -264,8 +263,12 @@ void CCGridBase::calculateVertexPoints(void)
 }
 
 // implementation of CCGrid3D
-
 CCGrid3D* CCGrid3D::gridWithSize(const ccGridSize& gridSize, CCTexture2D *pTexture, bool bFlipped)
+{
+    return CCGrid3D::create(gridSize, pTexture, bFlipped);
+}
+
+CCGrid3D* CCGrid3D::create(const ccGridSize& gridSize, CCTexture2D *pTexture, bool bFlipped)
 {
     CCGrid3D *pRet= new CCGrid3D();
 
@@ -286,6 +289,11 @@ CCGrid3D* CCGrid3D::gridWithSize(const ccGridSize& gridSize, CCTexture2D *pTextu
 }
 
 CCGrid3D* CCGrid3D::gridWithSize(const ccGridSize& gridSize)
+{
+    return CCGrid3D::create(gridSize);
+}
+
+CCGrid3D* CCGrid3D::create(const ccGridSize& gridSize)
 {
     CCGrid3D *pRet= new CCGrid3D();
 
@@ -480,6 +488,11 @@ CCTiledGrid3D::~CCTiledGrid3D(void)
 
 CCTiledGrid3D* CCTiledGrid3D::gridWithSize(const ccGridSize& gridSize, CCTexture2D *pTexture, bool bFlipped)
 {
+    return CCTiledGrid3D::create(gridSize, pTexture, bFlipped);
+}
+
+CCTiledGrid3D* CCTiledGrid3D::create(const ccGridSize& gridSize, CCTexture2D *pTexture, bool bFlipped)
+{
     CCTiledGrid3D *pRet= new CCTiledGrid3D();
 
     if (pRet)
@@ -499,6 +512,11 @@ CCTiledGrid3D* CCTiledGrid3D::gridWithSize(const ccGridSize& gridSize, CCTexture
 }
 
 CCTiledGrid3D* CCTiledGrid3D::gridWithSize(const ccGridSize& gridSize)
+{
+    return CCTiledGrid3D::create(gridSize);
+}
+
+CCTiledGrid3D* CCTiledGrid3D::create(const ccGridSize& gridSize)
 {
     CCTiledGrid3D *pRet= new CCTiledGrid3D();
 

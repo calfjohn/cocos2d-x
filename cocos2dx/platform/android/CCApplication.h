@@ -48,13 +48,18 @@ public:
     @brief    Get current applicaiton instance.
     @return Current application instance pointer.
     */
-    static CCApplication& sharedApplication();
+    static CCApplication* sharedApplication();
 
     /**
     @brief Get current language config
     @return Current language config
     */
     virtual ccLanguageType getCurrentLanguage();
+    
+    /**
+     @brief Get target platform
+     */
+    virtual TargetPlatform getTargetPlatform();
 
 protected:
     static CCApplication * sm_pSharedApplication;

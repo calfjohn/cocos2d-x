@@ -79,28 +79,35 @@ CCLabelTTF * CCLabelTTF::labelWithString(const char *string, const char *fontNam
 
 CCLabelTTF * CCLabelTTF::create(const char *string, const char *fontName, float fontSize)
 {
-    return CCLabelTTF::create(string, CCSizeZero, kCCTextAlignmentCenter, kCCVerticalTextAlignmentTop, fontName, fontSize);
+    return CCLabelTTF::create(string, fontName, fontSize,
+                              CCSizeZero, kCCTextAlignmentCenter, kCCVerticalTextAlignmentTop);
 }
 
 CCLabelTTF * CCLabelTTF::labelWithString(const char *string, const CCSize& dimensions, CCTextAlignment hAlignment, const char *fontName, float fontSize)
 {
-    return CCLabelTTF::create(string, dimensions, hAlignment, kCCVerticalTextAlignmentTop, fontName, fontSize);
+    return CCLabelTTF::create(string, fontName, fontSize,
+                              dimensions, hAlignment, kCCVerticalTextAlignmentTop);
 }
 
-CCLabelTTF * CCLabelTTF::create(const char *string, const CCSize& dimensions, CCTextAlignment hAlignment, const char *fontName, float fontSize)
+CCLabelTTF * CCLabelTTF::create(const char *string, const char *fontName, float fontSize,
+                                const CCSize& dimensions, CCTextAlignment hAlignment)
 {
-    return CCLabelTTF::create(string, dimensions, hAlignment, kCCVerticalTextAlignmentTop, fontName, fontSize);
+    return CCLabelTTF::create(string, fontName, fontSize, dimensions, hAlignment, kCCVerticalTextAlignmentTop);
 }
 
-CCLabelTTF* CCLabelTTF::labelWithString(const char *string, const cocos2d::CCSize &dimensions, CCTextAlignment hAlignment, CCVerticalTextAlignment vAlignment, const char *fontName, float fontSize)
+CCLabelTTF* CCLabelTTF::labelWithString(const char *string, const cocos2d::CCSize &dimensions, 
+                                        CCTextAlignment hAlignment, CCVerticalTextAlignment vAlignment, 
+                                        const char *fontName, float fontSize)
 {
-    return CCLabelTTF::create(string, dimensions, hAlignment, vAlignment, fontName, fontSize);
+    return CCLabelTTF::create(string, fontName, fontSize, dimensions, hAlignment, vAlignment);
 }
 
-CCLabelTTF* CCLabelTTF::create(const char *string, const cocos2d::CCSize &dimensions, CCTextAlignment hAlignment, CCVerticalTextAlignment vAlignment, const char *fontName, float fontSize)
+CCLabelTTF* CCLabelTTF::create(const char *string, const char *fontName, float fontSize,
+                               const CCSize &dimensions, CCTextAlignment hAlignment, 
+                               CCVerticalTextAlignment vAlignment)
 {
     CCLabelTTF *pRet = new CCLabelTTF();
-    if(pRet && pRet->initWithString(string, dimensions, hAlignment, vAlignment, fontName, fontSize))
+    if(pRet && pRet->initWithString(string, fontName, fontSize, dimensions, hAlignment, vAlignment))
     {
         pRet->autorelease();
         return pRet;
@@ -114,17 +121,21 @@ bool CCLabelTTF::init()
     return this->initWithString("", "Helvetica", 12);
 }
 
-bool CCLabelTTF::initWithString(const char *label, const CCSize& dimensions, CCTextAlignment alignment, const char *fontName, float fontSize)
+bool CCLabelTTF::initWithString(const char *label, const char *fontName, float fontSize, 
+                                const CCSize& dimensions, CCTextAlignment alignment)
 {
-    return this->initWithString(label, dimensions, alignment, kCCVerticalTextAlignmentTop, fontName, fontSize);
+    return this->initWithString(label, fontName, fontSize, dimensions, alignment, kCCVerticalTextAlignmentTop);
 }
 
 bool CCLabelTTF::initWithString(const char *label, const char *fontName, float fontSize)
 {
-    return this->initWithString(label, CCSizeZero, kCCTextAlignmentLeft, kCCVerticalTextAlignmentTop, fontName, fontSize);
+    return this->initWithString(label, fontName, fontSize, 
+                                CCSizeZero, kCCTextAlignmentLeft, kCCVerticalTextAlignmentTop);
 }
 
-bool CCLabelTTF::initWithString(const char *string, const cocos2d::CCSize &dimensions, CCTextAlignment hAlignment, CCVerticalTextAlignment vAlignment, const char *fontName, float fontSize)
+bool CCLabelTTF::initWithString(const char *string, const char *fontName, float fontSize,
+                                const cocos2d::CCSize &dimensions, CCTextAlignment hAlignment,
+                                CCVerticalTextAlignment vAlignment)
 {
     if (CCSprite::init())
     {
@@ -210,7 +221,7 @@ CCSize CCLabelTTF::getDimensions()
     return m_tDimensions;
 }
 
-void CCLabelTTF::setDimensions(CCSize &dim)
+void CCLabelTTF::setDimensions(const CCSize &dim)
 {
     if (dim.width != m_tDimensions.width || dim.height != m_tDimensions.height)
     {
@@ -267,47 +278,16 @@ void CCLabelTTF::setFontName(const char *fontName)
 void CCLabelTTF::updateTexture()
 {
     CCTexture2D *tex;
-	if (m_tDimensions.width == 0 || m_tDimensions.height == 0)
-    {
-        tex = new CCTexture2D();
-        tex->initWithString(m_string.c_str(), m_pFontName->c_str(), m_fFontSize * CC_CONTENT_SCALE_FACTOR()) ;
-    }
-	else
-    {
-        tex = new CCTexture2D();
-        tex->initWithString(m_string.c_str(),
-                            CC_SIZE_POINTS_TO_PIXELS(m_tDimensions), 
-                            m_hAlignment,
-                            m_vAlignment,
-                            m_pFontName->c_str(),
-                            m_fFontSize * CC_CONTENT_SCALE_FACTOR());
-    }
-		
-	// iPad ?
-	//if( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ) {
-    if (CCApplication::sharedApplication().isIpad())
-    {            
-		if (CC_CONTENT_SCALE_FACTOR() == 2)
-        {
-            tex->setResolutionType(kCCResolutioniPadRetinaDisplay);
-        }
-		else
-        {
-            tex->setResolutionType(kCCResolutioniPad);
-        }
-	}
-	// iPhone ?
-	else
-	{
-		if (CC_CONTENT_SCALE_FACTOR() == 2)
-        {
-            tex->setResolutionType(kCCResolutioniPhoneRetinaDisplay);
-        }
-		else
-        {
-            tex->setResolutionType(kCCResolutioniPhone);
-        }
-	}
+    
+    // let system compute label's width or height when its value is 0
+    // refer to cocos2d-x issue #1430
+    tex = new CCTexture2D();
+    tex->initWithString(m_string.c_str(),
+                        CC_SIZE_POINTS_TO_PIXELS(m_tDimensions), 
+                        m_hAlignment,
+                        m_vAlignment,
+                        m_pFontName->c_str(),
+                        m_fFontSize * CC_CONTENT_SCALE_FACTOR());
 	
     this->setTexture(tex);
     tex->release();

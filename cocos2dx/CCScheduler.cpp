@@ -161,9 +161,10 @@ void CCTimer::update(float dt)
                 {
                     (m_pTarget->*m_pfnSelector)(m_fElapsed);
                 }
+
                 if (m_nScriptHandler)
                 {
-                    CCScriptEngineManager::sharedManager()->getScriptEngine()->executeSchedule(m_nScriptHandler, m_fElapsed);
+                    CCScriptEngineManager::sharedManager()->getScriptEngine()->executeSchedule(this, m_fElapsed);
                 }
                 m_fElapsed = 0;
             }
@@ -179,10 +180,12 @@ void CCTimer::update(float dt)
                     {
                         (m_pTarget->*m_pfnSelector)(m_fElapsed);
                     }
+
                     if (m_nScriptHandler)
                     {
-                        CCScriptEngineManager::sharedManager()->getScriptEngine()->executeSchedule(m_nScriptHandler, m_fElapsed);
+                        CCScriptEngineManager::sharedManager()->getScriptEngine()->executeSchedule(this, m_fElapsed);
                     }
+
                     m_fElapsed = m_fElapsed - m_fDelay;
                     m_nTimesExecuted+=1;
                     m_bUseDelay = false;
@@ -196,10 +199,12 @@ void CCTimer::update(float dt)
                     {
                         (m_pTarget->*m_pfnSelector)(m_fElapsed);
                     }
+
                     if (m_nScriptHandler)
                     {
-                        CCScriptEngineManager::sharedManager()->getScriptEngine()->executeSchedule(m_nScriptHandler, m_fElapsed);
+                        CCScriptEngineManager::sharedManager()->getScriptEngine()->executeSchedule(this, m_fElapsed);
                     }
+
                     m_fElapsed = 0;
                     m_nTimesExecuted += 1;
 
@@ -481,9 +486,13 @@ void CCScheduler::removeUpdateFromHash(struct _listEntry *entry)
         free(element->entry);
 
         // hash entry
-        element->target->release();
+        CCObject* pTarget = element->target;
         HASH_DEL(m_pHashForUpdates, element);
         free(element);
+
+        // target#release should be the last one to prevent
+        // a possible double-free. eg: If the [target dealloc] might want to remove it itself from there
+        pTarget->release();
     }
 }
 
@@ -601,14 +610,14 @@ void CCScheduler::unscheduleAllSelectorsForTarget(CCObject *pTarget)
 
 unsigned int CCScheduler::scheduleScriptFunc(unsigned int nHandler, float fInterval, bool bPaused)
 {
-    CCSchedulerScriptHandlerEntry* pEntry = CCSchedulerScriptHandlerEntry::entryWithHandler(nHandler, fInterval, bPaused);
+    CCSchedulerScriptHandlerEntry* pEntry = CCSchedulerScriptHandlerEntry::create(nHandler, fInterval, bPaused);
     if (!m_pScriptHandlerEntries)
     {
-        m_pScriptHandlerEntries = CCArray::create(20);
+        m_pScriptHandlerEntries = CCArray::createWithCapacity(20);
         m_pScriptHandlerEntries->retain();
     }
     m_pScriptHandlerEntries->addObject(pEntry);
-    return pEntry->getEntryID();
+    return pEntry->getEntryId();
 }
 
 void CCScheduler::unscheduleScriptEntry(unsigned int uScheduleScriptEntryID)
@@ -616,7 +625,7 @@ void CCScheduler::unscheduleScriptEntry(unsigned int uScheduleScriptEntryID)
     for (int i = m_pScriptHandlerEntries->count() - 1; i >= 0; i--)
     {
         CCSchedulerScriptHandlerEntry* pEntry = static_cast<CCSchedulerScriptHandlerEntry*>(m_pScriptHandlerEntries->objectAtIndex(i));
-        if (pEntry->getEntryID() == uScheduleScriptEntryID)
+        if (pEntry->getEntryId() == uScheduleScriptEntryID)
         {
             pEntry->markedForDeletion();
             break;
@@ -771,6 +780,12 @@ void CCScheduler::update(float dt)
     {
         if ((! pEntry->paused) && (! pEntry->markedForDeletion))
         {
+            CCScriptEngineProtocol* pEngine = CCScriptEngineManager::sharedManager()->getScriptEngine();
+            if (pEngine != NULL && kScriptTypeJavascript == pEngine->getScriptType())
+            {
+                CCScriptEngineManager::sharedManager()->getScriptEngine()->executeSchedule(NULL, dt, (CCNode *)pEntry->target);
+            }
+            
             pEntry->target->update(dt);            
         }
     }

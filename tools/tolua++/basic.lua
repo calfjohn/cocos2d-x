@@ -10,8 +10,6 @@ local CCObjectTypes = {
     "CCActionInstant",
     "CCCallFunc",
     "CCCallFuncN",
-    "CCCallFuncND",
-    "CCCallFuncO",
     "CCFlipX",
     "CCFlipY",
     "CCHide",
@@ -25,6 +23,10 @@ local CCObjectTypes = {
     "CCAccelDeccelAmplitude",
     "CCActionCamera",
     "CCOrbitCamera",
+	"CCCardinalSplineTo",
+	"CCCardinalSplineBy",
+	"CCCatmullRomTo",
+	"CCCatmullRomBy",
     "CCActionEase",
     "CCEaseBackIn",
     "CCEaseBackInOut",
@@ -142,6 +144,13 @@ local CCObjectTypes = {
     "CCTransitionSplitCols",
     "CCTransitionSplitRows",
     "CCTransitionTurnOffTiles",
+	"CCTransitionProgress",
+	"CCTransitionProgressRadialCCW",
+	"CCTransitionProgressRadialCW",
+	"CCTransitionProgressHorizontal",
+	"CCTransitionProgressVertical",
+	"CCTransitionProgressInOut",
+	"CCTransitionProgressOutIn",
     "CCSprite",
     "CCLabelTTF",
     "CCTextFieldTTF",
@@ -169,19 +178,35 @@ local CCObjectTypes = {
     "CCTouch",
     "CCTouchDispatcher",
     "CCTouchHandler",
+	"CCParticleFire",
+	"CCParticleFireworks",
+	"CCParticleSun",
+	"CCParticleGalaxy",
+	"CCParticleFlower",
+	"CCParticleMeteor",
+	"CCParticleSpiral",
+	"CCParticleExplosion",
+	"CCParticleSmoke",
+	"CCParticleSnow",
+	"CCParticleRain",
 }
 
 -- register CCObject types
 for i = 1, #CCObjectTypes do
-    _push_functions[CCObjectTypes[i]] = "tolua_pushusertype_ccobject"
+    _push_functions[CCObjectTypes[i]] = "toluafix_pushusertype_ccobject"
 end
 
--- register LUA_FUNCTION type
-_to_functions["LUA_FUNCTION"] = "tolua_ref_function"
-_is_functions["LUA_FUNCTION"] = "tolua_isfunction"
+-- register LUA_FUNCTION, LUA_TABLE, LUA_HANDLE type
+_to_functions["LUA_FUNCTION"] = "toluafix_ref_function"
+_is_functions["LUA_FUNCTION"] = "toluafix_isfunction"
+_to_functions["LUA_TABLE"] = "toluafix_totable"
+_is_functions["LUA_TABLE"] = "toluafix_istable"
 
 
 function get_property_methods_hook(ptype, name)
+    if ptype == "IsVisible" then
+        return "isVisible", "setVisible"
+    end
     if string.sub(ptype, 1, 2) == "CC" then
         ptype = string.sub(ptype, 3)
     end

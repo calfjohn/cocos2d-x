@@ -61,7 +61,15 @@ CCObject::~CCObject(void)
     // if the object is referenced by Lua engine, remove it
     if (m_nLuaID)
     {
-        CCScriptEngineManager::sharedManager()->getScriptEngine()->removeCCObjectByID(m_nLuaID);
+        CCScriptEngineManager::sharedManager()->getScriptEngine()->removeScriptObjectByCCObject(this);
+    }
+    else
+    {
+        CCScriptEngineProtocol* pEngine = CCScriptEngineManager::sharedManager()->getScriptEngine();
+        if (pEngine != NULL && pEngine->getScriptType() == kScriptTypeJavascript)
+        {
+            pEngine->removeScriptObjectByCCObject(this);
+        }
     }
 }
 
@@ -96,7 +104,7 @@ CCObject* CCObject::autorelease(void)
     return this;
 }
 
-bool CCObject::isSingleRefrence(void)
+bool CCObject::isSingleReference(void)
 {
     return m_uReference == 1;
 }

@@ -69,10 +69,10 @@ CCApplication::Orientation CCApplication::setOrientation(Orientation orientation
 //////////////////////////////////////////////////////////////////////////
 // static member function
 //////////////////////////////////////////////////////////////////////////
-CCApplication& CCApplication::sharedApplication()
+CCApplication* CCApplication::sharedApplication()
 {
     CC_ASSERT(sm_pSharedApplication);
-    return *sm_pSharedApplication;
+    return sm_pSharedApplication;
 }
 
 ccLanguageType CCApplication::getCurrentLanguage()
@@ -110,6 +110,11 @@ ccLanguageType CCApplication::getCurrentLanguage()
     }
     
     return ret;
+}
+
+TargetPlatform CCApplication::getTargetPlatform()
+{
+    return kTargetAndroid;
 }
 
 NS_CC_END

@@ -1,11 +1,18 @@
 #ifndef __CC_APPLICATION_PROTOCOL_H__
 #define __CC_APPLICATION_PROTOCOL_H__
 
-#include "ccTypes.h"
-
 NS_CC_BEGIN
 
-class CCRect;
+enum TargetPlatform
+{
+    kTargetWindows,
+    kTargetLinux,
+    kTargetMacOS,
+    kTargetAndroid,
+    kTargetIphone,
+    kTargetIpad,
+    kTargetBlackBerry,
+};
 
 /**
  * @addtogroup platform
@@ -49,8 +56,10 @@ public:
     */
     virtual ccLanguageType getCurrentLanguage() = 0;
     
-    virtual bool isIpad() { return false; }
-
+    /**
+     @brief Get target platform
+     */
+    virtual TargetPlatform getTargetPlatform() = 0;
 };
 
 // end of platform group

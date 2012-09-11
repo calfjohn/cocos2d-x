@@ -76,16 +76,6 @@ To enabled set it to 1. Disabled by default.
 #define CC_FIX_ARTIFACTS_BY_STRECHING_TEXEL 0
 #endif
 
-
-/** @def CC_DIRECTOR_STATS_POSITION
- Position of the FPS
- 
- Default: 0,0 (bottom-left corner)
- */
-#ifndef CC_DIRECTOR_STATS_POSITION
-#define CC_DIRECTOR_STATS_POSITION ccp(0,0)
-#endif
-
 /** @def CC_DIRECTOR_FPS_INTERVAL
  Senconds between FPS updates.
  0.5 seconds, means that the FPS number will be updated every 0.5 seconds.
@@ -175,11 +165,12 @@ Only valid for cocos2d-mac. Not supported on cocos2d-ios.
  
  */
 #ifndef CC_TEXTURE_ATLAS_USE_VAO
-    #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS) || (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
+    #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS) || (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32) || (CC_TARGET_PLATFORM == CC_PLATFORM_MAC)
         #define CC_TEXTURE_ATLAS_USE_VAO 1
     #else
         /* Some android devices cannot support VAO very well, so we disable it by default for android platform. */
-        #define CC_TEXTURE_ATLAS_USE_VAO 0
+        /* Blackberry also doesn't support this feature. */
+		#define CC_TEXTURE_ATLAS_USE_VAO 0
     #endif
 #endif
 

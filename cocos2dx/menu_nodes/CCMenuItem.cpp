@@ -49,12 +49,18 @@ const unsigned int    kDisableTag = 0x3;
 //
 // CCMenuItem
 //
-CCMenuItem * CCMenuItem::itemWithTarget(CCObject *rec, SEL_MenuHandler selector)
+
+CCMenuItem* CCMenuItem::itemWithTarget(CCObject *rec, SEL_MenuHandler selector)
 {
     return CCMenuItem::create(rec, selector);
 }
 
-CCMenuItem * CCMenuItem::create(CCObject *rec, SEL_MenuHandler selector)
+CCMenuItem* CCMenuItem::create()
+{
+    return CCMenuItem::create(NULL, NULL);
+}
+
+CCMenuItem* CCMenuItem::create(CCObject *rec, SEL_MenuHandler selector)
 {
     CCMenuItem *pRet = new CCMenuItem();
     pRet->initWithTarget(rec, selector);
@@ -74,7 +80,7 @@ bool CCMenuItem::initWithTarget(CCObject *rec, SEL_MenuHandler selector)
 
 CCMenuItem::~CCMenuItem()
 {
-    unregisterScriptHandler();
+    unregisterScriptTapHandler();
 }
 
 void CCMenuItem::selected()
@@ -87,20 +93,20 @@ void CCMenuItem::unselected()
     m_bIsSelected = false;
 }
 
-void CCMenuItem::registerScriptHandler(int nHandler)
+void CCMenuItem::registerScriptTapHandler(int nHandler)
 {
-    unregisterScriptHandler();
-    m_nScriptHandler = nHandler;
-    LUALOG("[LUA] Add CCMenuItem script handler: %d", m_nScriptHandler);
+    unregisterScriptTapHandler();
+    m_nScriptTapHandler = nHandler;
+    LUALOG("[LUA] Add CCMenuItem script handler: %d", m_nScriptTapHandler);
 }
 
-void CCMenuItem::unregisterScriptHandler(void)
+void CCMenuItem::unregisterScriptTapHandler(void)
 {
-    if (m_nScriptHandler)
+    if (m_nScriptTapHandler)
     {
-        CCScriptEngineManager::sharedManager()->getScriptEngine()->removeLuaHandler(m_nScriptHandler);
-        LUALOG("[LUA] Remove CCMenuItem script handler: %d", m_nScriptHandler);
-        m_nScriptHandler = 0;
+        CCScriptEngineManager::sharedManager()->getScriptEngine()->removeScriptHandler(m_nScriptTapHandler);
+        LUALOG("[LUA] Remove CCMenuItem script handler: %d", m_nScriptTapHandler);
+        m_nScriptTapHandler = 0;
     }
 }
 
@@ -113,9 +119,9 @@ void CCMenuItem::activate()
             (m_pListener->*m_pfnSelector)(this);
         }
         
-        if (m_nScriptHandler)
+        if (kScriptTypeNone != m_eScriptType)
         {
-            CCScriptEngineManager::sharedManager()->getScriptEngine()->executeFunctionWithIntegerData(m_nScriptHandler, getTag());
+            CCScriptEngineManager::sharedManager()->getScriptEngine()->executeMenuItemEvent(this);
         }
     }
 }
@@ -151,6 +157,7 @@ void CCMenuItem::setTarget(CCObject *rec, SEL_MenuHandler selector)
 //
 //CCMenuItemLabel
 //
+
 const ccColor3B& CCMenuItemLabel::getDisabledColor()
 {
     return m_tDisabledColor;
@@ -312,6 +319,7 @@ const ccColor3B& CCMenuItemLabel::getColor()
 //
 //CCMenuItemAtlasFont
 //
+
 CCMenuItemAtlasFont * CCMenuItemAtlasFont::itemWithString(const char *value, const char *charMapFile, int itemWidth, int itemHeight, char startCharMap)
 {
     return CCMenuItemAtlasFont::create(value, charMapFile, itemWidth, itemHeight, startCharMap);
@@ -350,6 +358,7 @@ bool CCMenuItemAtlasFont::initWithString(const char *value, const char *charMapF
 //
 //CCMenuItemFont
 //
+
 void CCMenuItemFont::setFontSize(unsigned int s)
 {
     _fontSize = s;
@@ -448,6 +457,7 @@ const char* CCMenuItemFont::fontNameObj()
 //
 //CCMenuItemSprite
 //
+
 CCNode * CCMenuItemSprite::getNormalImage()
 {
     return m_pNormalImage;
@@ -527,6 +537,7 @@ void CCMenuItemSprite::setDisabledImage(CCNode* pImage)
 //
 //CCMenuItemSprite - CCRGBAProtocol protocol
 //
+
 void CCMenuItemSprite::setOpacity(GLubyte opacity)
 {
     dynamic_cast<CCRGBAProtocol*>(m_pNormalImage)->setOpacity(opacity);
@@ -694,6 +705,10 @@ void CCMenuItemSprite::updateImagesVisibility()
     }
 }
 
+///
+/// CCMenuItemImage
+///
+
 CCMenuItemImage* CCMenuItemImage::node()
 {
     return CCMenuItemImage::create();
@@ -796,21 +811,23 @@ bool CCMenuItemImage::initWithNormalImage(const char *normalImage, const char *s
 //
 void CCMenuItemImage::setNormalSpriteFrame(CCSpriteFrame * frame)
 {
-    setNormalImage(CCSprite::create(frame));
+    setNormalImage(CCSprite::createWithSpriteFrame(frame));
 }
 
 void CCMenuItemImage::setSelectedSpriteFrame(CCSpriteFrame * frame)
 {
-    setSelectedImage(CCSprite::create(frame));
+    setSelectedImage(CCSprite::createWithSpriteFrame(frame));
 }
 
 void CCMenuItemImage::setDisabledSpriteFrame(CCSpriteFrame * frame)
 {
-    setDisabledImage(CCSprite::create(frame));
+    setDisabledImage(CCSprite::createWithSpriteFrame(frame));
 }
+
 //
 // MenuItemToggle
 //
+
 void CCMenuItemToggle::setSubItems(CCArray* var)
 {
     CC_SAFE_RETAIN(var);
@@ -834,7 +851,7 @@ CCMenuItemToggle * CCMenuItemToggle::itemWithTarget(CCObject* target, SEL_MenuHa
     return pRet;
 }
 
-CCMenuItemToggle * CCMenuItemToggle::create(CCObject* target, SEL_MenuHandler selector, CCMenuItem* item, ...)
+CCMenuItemToggle * CCMenuItemToggle::createWithTarget(CCObject* target, SEL_MenuHandler selector, CCMenuItem* item, ...)
 {
     va_list args;
     va_start(args, item);
@@ -842,6 +859,14 @@ CCMenuItemToggle * CCMenuItemToggle::create(CCObject* target, SEL_MenuHandler se
     pRet->initWithTarget(target, selector, item, args);
     pRet->autorelease();
     va_end(args);
+    return pRet;
+}
+
+CCMenuItemToggle * CCMenuItemToggle::create()
+{
+    CCMenuItemToggle *pRet = new CCMenuItemToggle();
+    pRet->initWithItem(NULL);
+    pRet->autorelease();
     return pRet;
 }
 
@@ -881,7 +906,9 @@ bool CCMenuItemToggle::initWithItem(CCMenuItem *item)
     CCMenuItem::initWithTarget(NULL, NULL);
     this->m_pSubItems = CCArray::create();
     this->m_pSubItems->retain();
-    m_pSubItems->addObject(item);
+    if (item) {
+        m_pSubItems->addObject(item);
+    }
     m_uSelectedIndex = UINT_MAX;
     this->setSelectedIndex(0);
     return true;
@@ -898,7 +925,7 @@ CCMenuItemToggle::~CCMenuItemToggle()
 }
 void CCMenuItemToggle::setSelectedIndex(unsigned int index)
 {
-    if( index != m_uSelectedIndex )
+    if( index != m_uSelectedIndex && m_pSubItems->count() > 0 )
     {
         m_uSelectedIndex = index;
         CCMenuItem *currentItem = (CCMenuItem*)getChildByTag(kCurrentItem);

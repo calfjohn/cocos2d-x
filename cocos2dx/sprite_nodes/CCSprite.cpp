@@ -58,12 +58,13 @@ NS_CC_BEGIN
 #define RENDER_IN_SUBPIXEL(__A__) ( (int)(__A__))
 #endif
 
+
 CCSprite* CCSprite::spriteWithTexture(CCTexture2D *pTexture)
 {
-    return CCSprite::create(pTexture);
+    return CCSprite::createWithTexture(pTexture);
 }
 
-CCSprite* CCSprite::create(CCTexture2D *pTexture)
+CCSprite* CCSprite::createWithTexture(CCTexture2D *pTexture)
 {
     CCSprite *pobSprite = new CCSprite();
     if (pobSprite && pobSprite->initWithTexture(pTexture))
@@ -77,10 +78,10 @@ CCSprite* CCSprite::create(CCTexture2D *pTexture)
 
 CCSprite* CCSprite::spriteWithTexture(CCTexture2D *pTexture, const CCRect& rect)
 {
-    return CCSprite::create(pTexture, rect);
+    return CCSprite::createWithTexture(pTexture, rect);
 }
 
-CCSprite* CCSprite::create(CCTexture2D *pTexture, const CCRect& rect)
+CCSprite* CCSprite::createWithTexture(CCTexture2D *pTexture, const CCRect& rect)
 {
     CCSprite *pobSprite = new CCSprite();
     if (pobSprite && pobSprite->initWithTexture(pTexture, rect))
@@ -128,13 +129,13 @@ CCSprite* CCSprite::create(const char *pszFileName, const CCRect& rect)
 
 CCSprite* CCSprite::spriteWithSpriteFrame(CCSpriteFrame *pSpriteFrame)
 {
-    return CCSprite::create(pSpriteFrame);
+    return CCSprite::createWithSpriteFrame(pSpriteFrame);
 }
 
-CCSprite* CCSprite::create(CCSpriteFrame *pSpriteFrame)
+CCSprite* CCSprite::createWithSpriteFrame(CCSpriteFrame *pSpriteFrame)
 {
     CCSprite *pobSprite = new CCSprite();
-    if (pobSprite && pobSprite->initWithSpriteFrame(pSpriteFrame))
+    if (pSpriteFrame && pobSprite && pobSprite->initWithSpriteFrame(pSpriteFrame))
     {
         pobSprite->autorelease();
         return pobSprite;
@@ -151,11 +152,14 @@ CCSprite* CCSprite::spriteWithSpriteFrameName(const char *pszSpriteFrameName)
 CCSprite* CCSprite::createWithSpriteFrameName(const char *pszSpriteFrameName)
 {
     CCSpriteFrame *pFrame = CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(pszSpriteFrameName);
-
+    
+#if COCOS2D_DEBUG > 0
     char msg[256] = {0};
     sprintf(msg, "Invalid spriteFrameName: %s", pszSpriteFrameName);
     CCAssert(pFrame != NULL, msg);
-    return create(pFrame);
+#endif
+    
+    return createWithSpriteFrame(pFrame);
 }
 
 CCSprite* CCSprite::node()
@@ -1015,18 +1019,17 @@ bool CCSprite::isFrameDisplayed(CCSpriteFrame *pFrame)
 {
     CCRect r = pFrame->getRect();
 
-    return (CCRect::CCRectEqualToRect(r, m_obRect) &&
-        pFrame->getTexture()->getName() == m_pobTexture->getName() &&
-        CCPoint::CCPointEqualToPoint( pFrame->getOffset(), m_obUnflippedOffsetPositionFromCenter ) 
-        );
+    return (r.equals(m_obRect) &&
+            pFrame->getTexture()->getName() == m_pobTexture->getName() &&
+            pFrame->getOffset().equals(m_obUnflippedOffsetPositionFromCenter));
 }
 
 CCSpriteFrame* CCSprite::displayFrame(void)
 {
-    return CCSpriteFrame::create(m_pobTexture,
+    return CCSpriteFrame::createWithTexture(m_pobTexture,
                                            CC_RECT_POINTS_TO_PIXELS(m_obRect),
                                            m_bRectRotated,
-                                           m_obUnflippedOffsetPositionFromCenter,
+                                           CC_POINT_POINTS_TO_PIXELS(m_obUnflippedOffsetPositionFromCenter),
                                            CC_SIZE_POINTS_TO_PIXELS(m_tContentSize));
 }
 

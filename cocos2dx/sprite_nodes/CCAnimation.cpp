@@ -69,7 +69,7 @@ CCObject* CCAnimationFrame::copyWithZone(CCZone* pZone)
     else
     {
         pCopy = new CCAnimationFrame();
-        pZone = pNewZone = new CCZone(pCopy);
+        pNewZone = new CCZone(pCopy);
     }
 
     pCopy->initWithSpriteFrame((CCSpriteFrame*)m_pSpriteFrame->copy()->autorelease(),
@@ -97,10 +97,10 @@ CCAnimation* CCAnimation::create(void)
 
 CCAnimation* CCAnimation::animationWithSpriteFrames(CCArray *frames, float delay/* = 0.0f*/)
 {
-    return CCAnimation::create(frames, delay);
+    return CCAnimation::createWithSpriteFrames(frames, delay);
 }
 
-CCAnimation* CCAnimation::create(CCArray *frames, float delay/* = 0.0f*/)
+CCAnimation* CCAnimation::createWithSpriteFrames(CCArray *frames, float delay/* = 0.0f*/)
 {
     CCAnimation *pAnimation = new CCAnimation();
     pAnimation->initWithSpriteFrames(frames, delay);
@@ -161,7 +161,7 @@ bool CCAnimation::initWithAnimationFrames(CCArray* arrayOfAnimationFrames, float
     m_fDelayPerUnit = delayPerUnit;
     m_uLoops = loops;
 
-    setFrames(CCArray::create(arrayOfAnimationFrames));
+    setFrames(CCArray::createWithArray(arrayOfAnimationFrames));
 
     CCObject* pObj = NULL;
     CCARRAY_FOREACH(m_pFrames, pObj)
@@ -205,13 +205,13 @@ void CCAnimation::addSpriteFrameWithFileName(const char *pszFileName)
     CCTexture2D *pTexture = CCTextureCache::sharedTextureCache()->addImage(pszFileName);
     CCRect rect = CCRectZero;
     rect.size = pTexture->getContentSize();
-    CCSpriteFrame *pFrame = CCSpriteFrame::create(pTexture, rect);
+    CCSpriteFrame *pFrame = CCSpriteFrame::createWithTexture(pTexture, rect);
     addSpriteFrame(pFrame);
 }
 
 void CCAnimation::addSpriteFrameWithTexture(CCTexture2D *pobTexture, const CCRect& rect)
 {
-    CCSpriteFrame *pFrame = CCSpriteFrame::create(pobTexture, rect);
+    CCSpriteFrame *pFrame = CCSpriteFrame::createWithTexture(pobTexture, rect);
     addSpriteFrame(pFrame);
 }
 
@@ -232,7 +232,7 @@ CCObject* CCAnimation::copyWithZone(CCZone* pZone)
     else
     {
         pCopy = new CCAnimation();
-        pZone = pNewZone = new CCZone(pCopy);
+        pNewZone = new CCZone(pCopy);
     }
 
     pCopy->initWithAnimationFrames(m_pFrames, m_fDelayPerUnit, m_uLoops);
